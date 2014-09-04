@@ -2,6 +2,7 @@ package fr.applicius.foorgol;
 
 import java.io.InputStreamReader;
 import java.io.InputStream;
+import java.io.Closeable;
 
 import java.util.ArrayList;
 
@@ -12,6 +13,9 @@ import org.apache.http.HttpResponse;
 
 import org.apache.http.message.BasicNameValuePair;
 
+import org.apache.http.impl.client.CloseableHttpClient;
+
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.methods.HttpPost;
 
@@ -21,11 +25,11 @@ import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
 /**
- * OAuth utility. 
+ * OAuth client. 
  *
  * @author cchantep
  */
-public final class OAuth {
+public class OAuthClient {
     // --- Shared ---
 
     /**
@@ -41,10 +45,10 @@ public final class OAuth {
      * @param request Initial request
      * @param accessToken Access token previously obtained from Google OAuth
      */
-    public static <R extends HttpRequestBase> R prepareRequest(final R request, final String accessToken) { 
+    public static <R extends HttpRequestBase> R prepare(final R request, final String accessToken) { 
         request.setHeader("Authorization", "Bearer " + accessToken);
         return request;
-    } // end of prepareRequest
+    } // end of prepare
 
     /**
      * Returns request to refresh on offline access token from Google OAuth.
@@ -77,6 +81,23 @@ public final class OAuth {
 
         return req;
     } // end of refreshRequest
+
+    /**
+     * Returns request as refreshable.
+     *
+     * @param unprepared Unprepared request ({#prepareRequest} not applied on)
+     * @param accessToken Offline access token
+     * @param clientId OAuth client ID (see Credentials in Google Dev Console)
+     * @param clientSecret OAuth client secret
+     * @param refreshToken Refresh token previously obtained along with offline access token.
+     * @see #refreshRequest
+     */
+    public static <R extends HttpRequestBase> Refreshable<R> refreshable(final R unprepared, final String accessToken, final String clientId, final String clientSecret, final String refreshToken) {
+
+        return new Refreshable<R>(unprepared, accessToken,
+                                  clientId, clientSecret, refreshToken);
+
+    } // end of refreshable
 
     /**
      * Parses |response| to a refresh request.
@@ -141,4 +162,103 @@ public final class OAuth {
             } // end of if
         } // end of finally
     } // end of parseRefreshResponse
+
+    // --- Inner classes ---
+
+    /**
+     * Refreshable request.
+     */
+    public static class Refreshable<R extends HttpRequestBase> { 
+        // --- Properties ---
+
+        /**
+         * Underlying prepared request
+         */
+        final R underlying;
+
+        /**
+         * Access token
+         */
+        final String accessToken;
+
+        /**
+         * OAuth Client ID
+         */
+        final String clientId;
+
+        /**
+         * OAuth client secret
+         */
+        final String clientSecret;
+
+        /**
+         * Refresh token
+         */
+        final String refreshToken;
+
+        // ---
+
+        /**
+         * @param unprepared Unprepared request ({OAuth#prepareRequest} not applied on).
+         */
+        Refreshable(final R unprepared, 
+                    final String accessToken,
+                    final String clientId,
+                    final String clientSecret,
+                    final String refreshToken) {
+
+            this.accessToken = accessToken;
+            this.clientId = clientId;
+            this.clientSecret = clientSecret;
+            this.refreshToken = refreshToken;
+            this.underlying = unprepared;
+        } // end of <init>
+
+        // ---
+
+        /**
+         * Executes underlying request with given |client|.
+         * If first HTTP call returns 401 status code, it tries to refresh
+         * access token.
+         * (Given client is not closed)
+         */
+        public CloseableHttpResponse executeWith(final CloseableHttpClient client) {
+            CloseableHttpResponse resp = null;
+
+            try {
+                resp = client.
+                    execute(prepare(this.underlying, this.accessToken));
+
+                final int statusCode = resp.getStatusLine().getStatusCode();
+
+                logger.log(Level.FINER, "Initial status code: {0}", statusCode);
+
+                if (statusCode == 200) {
+                    return resp;
+                } else if (statusCode == 401) {
+                    logger.warning("Will try to execute with refreshed token");
+
+                    resp.close();
+
+                    resp = client.execute(refreshRequest(clientId, clientSecret, refreshToken));
+
+                    final String tok = parseRefreshResponse(resp);
+
+                    resp.close();
+
+                    logger.log(Level.FINE, "Refresh access token: {0}", tok);
+                    
+                    return client.execute(prepare(underlying, tok));
+                } // end of else if
+
+                // ---
+
+                throw new IllegalStateException("Unexpected status code: " + statusCode);
+            } catch (RuntimeException re) {
+                throw re;
+            } catch (Exception e) {
+                throw new RuntimeException("Fails to execute refreshable request", e);
+            } // end of catch
+        } // end of execute
+    }
 } // end of class OAuth
