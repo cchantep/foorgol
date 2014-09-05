@@ -3,8 +3,11 @@ package fr.applicius.foorgol
 import java.io.InputStreamReader
 import java.util.{ Date, Locale }
 import java.text.SimpleDateFormat
+import java.net.URI
 
-import org.apache.http.NameValuePair
+import org.apache.http.{ HttpResponse, NameValuePair }
+import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.message.BasicNameValuePair
 
 import scala.xml.{ Elem, InputSource, Node, XML }
 import scala.concurrent.{ ExecutionContext, Future }
@@ -22,6 +25,7 @@ trait Spreadsheet { http: WithHttp ⇒
   /** Can be used with offline access token, to refresh it. */
   def refreshToken: Option[RefreshToken]
 
+  /** Returns list of all available spreadsheets. */
   def list: Future[List[SpreadsheetInfo]] = {
     @annotation.tailrec
     def go(entries: Seq[Node], infos: List[SpreadsheetInfo]): Future[List[SpreadsheetInfo]] = entries.headOption match {
@@ -40,10 +44,24 @@ trait Spreadsheet { http: WithHttp ⇒
   }
 
   /**
-   * Returns list of worksheets from given URL.
-   * @see SpreadsheetInfo#worksheetsUrl
+   * Returns information for matching spreadsheet, if any.
+   *
+   * @param id Spreadsheet ID ([[SpreadsheetInfo.id]])
    */
-  def worksheets(url: String): Future[List[WorksheetInfo]] = {
+  def spreadsheet(id: String): Future[SpreadsheetInfo] = for {
+    feed ← feed(_.get(new URI(
+      s"https://spreadsheets.google.com/feeds/spreadsheets/$id")))
+    info ← (feed \\ "entry").headOption.flatMap(Spreadsheet.spreadsheetInfo).
+      fold(Future.failed[SpreadsheetInfo](
+        new RuntimeException(s"Invalid spreadsheet entry")))(
+        Future.successful(_))
+  } yield info
+
+  /**
+   * Returns list of worksheets from given URI
+   * ([[SpreadsheetInfo.worksheetsUri]]).
+   */
+  def worksheets(uri: URI): Future[List[WorksheetInfo]] = {
     @annotation.tailrec
     def go(entries: Seq[Node], infos: List[WorksheetInfo]): Future[List[WorksheetInfo]] = entries.headOption match {
       case Some(entry) ⇒ Spreadsheet.worksheetInfo(entry) match {
@@ -55,20 +73,82 @@ trait Spreadsheet { http: WithHttp ⇒
     }
 
     for {
-      feed ← feed(_.get(url))
+      feed ← feed(_.get(uri))
       infos ← Future(feed \\ "entry").flatMap(go(_, Nil))
     } yield infos
   }
 
   /**
-   * Returns list of cells from given URL.
-   * @see WorksheetInfo#cellsUrl
+   * Processes worksheets found for specified spreadsheet
+   * ([[SpreadsheetInfo.worksheetsUri]]).
    *
-   * @param url Cells URL
+   * @param id Spreadsheet ID
+   * @param z Initial value for function `f`
+   * @param f Function given current state and extracted information. Must return either a final value at `Left` if must not look at other worksheets, or updated value at `Right` to go on processing worksheets.
+   *
+   * {{{
+   * // api: Spreadsheet
+   *
+   * // Will find the second worksheet...
+   * val second: Future[Option[WorksheetInfo]] =
+   *   api.worksheet("spreadsheetId")(1 -> None) { (st, w) =>
+   *   val (i, _) = st
+   *   if (i == 2) /* found some, so no next step */ Left(2 -> Some(w))
+   *   else Right(i+1 -> None)
+   * } map (_._2)
+   * }}}
+   */
+  def withWorksheets[T](id: String)(z: T)(f: (T, WorksheetInfo) ⇒ Either[T, T]): Future[T] = {
+    @annotation.tailrec
+    def go(state: T, entries: Seq[Node]): Future[T] = entries.headOption match {
+      case Some(entry) ⇒ Spreadsheet.worksheetInfo(entry) match {
+        case w @ Some(info) ⇒ f(state, info) match {
+          case Right(next) ⇒ go(next, entries.tail) // required to go next
+          case Left(finval) ⇒ // final value, no need to look after
+            Future.successful(finval)
+        }
+        case _ ⇒ Future.failed[T](
+          new RuntimeException(s"Invalid worksheet entry: $entry"))
+      }
+      case _ ⇒ Future.successful[T](state)
+    }
+
+    for {
+      feed ← feed(_.get(new URI(
+        s"https://spreadsheets.google.com/feeds/worksheets/$id/private/full")))
+      info ← Future(feed \\ "entry").flatMap(go(z, _))
+    } yield info
+  }
+
+  /**
+   * Returns worksheet from specified worksheet
+   * whose index in feed is given one, if any.
+   *
+   * @param id Spreadsheet ID
+   * @param index Worksheet index in underlying feed (first = 0)
+   * @see [[withWorksheets]]
+   *
+   * {{{
+   * val first: Future[Option[WorksheetInfo]] =
+   *   worksheet("spreadsheetId", 0)
+   * }}}
+   */
+  def worksheet(id: String, index: Int): Future[Option[WorksheetInfo]] = {
+    val I = index
+    withWorksheets[(Int, Option[WorksheetInfo])](id)(0 -> None) {
+      case ((I, _), matching) ⇒ Left(0 -> Some(matching))
+      case ((i, v), _)        ⇒ Right(i + 1 -> None)
+    } map (_._2)
+  }
+
+  /**
+   * Returns list of cells from given URI ([[WorksheetInfo.cellsUri]]).
+   *
+   * @param uri Cells URI
    * @param rowRange Row range
    * @param colRange Column range
    */
-  def cells(url: String, rowRange: Option[WorksheetRange] = None, colRange: Option[WorksheetRange] = None): Future[WorksheetCells] = for {
+  def cells(uri: URI, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[WorksheetCells] = for {
     feed ← feed { client ⇒
       val ps: List[NameValuePair] = (rowRange, colRange) match {
         case (Some(rr), Some(cr)) ⇒
@@ -77,7 +157,7 @@ trait Spreadsheet { http: WithHttp ⇒
         case (Some(rr), _) ⇒ rangeParams("%s-row", rr)
         case _             ⇒ Nil
       }
-      client.get(url, ps)
+      client.get(uri, ps)
     }
     co ← Future(Spreadsheet.worksheetCells(feed))
     cells ← co.fold[Future[WorksheetCells]](
@@ -86,18 +166,111 @@ trait Spreadsheet { http: WithHttp ⇒
   } yield cells
 
   /**
-   * Inserts a new row (must not already exist)
-   * @param url Cells URL (`WorksheetInfo.cellsUrl`)
-   * @param after Position of row after which new row must be inserted
+   * Returns matching cells, if any.
+   *
+   * @param id Spreadsheet ID
+   * @param index Worksheet index (first = 0)
+   * @param rowRange Optional row range
+   * @param colRange Optional column range
+   *
+   * {{{
+   * cells("spreadsheetId", 0) // all cells of first worksheet
+   * }}}
    */
-  def insertAfter(url: String, after: Int = 0): Future[Unit] = for {
-    client ← Future(client acquireAndGet identity)
-  } yield ???
+  def cells(id: String, index: Int, rowRange: Option[WorksheetRange] = None, colRange: Option[WorksheetRange] = None): Future[WorksheetCells] = for {
+    v ← worksheet(id, index)
+    w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
+      s"No matching worksheet: $id, $index")))(Future.successful)
+    cs ← cells(w.cellsUri, rowRange, colRange)
+  } yield cs
+
+  /**
+   * Changes cells. Any existing content will be overwrited .
+   *
+   * @param uri Cells URI ([[WorksheetInfo.cellsUri]])
+   * @param cells List of cells to be created
+   * @return List of version URI for each created cell
+   */
+  def change(uri: URI, cells: List[CellValue]): Future[List[URI]] = {
+    @annotation.tailrec
+    def versionUri(links: Seq[Node]): Option[URI] = links.headOption match {
+      case Some(l) ⇒
+        if (l.attribute("rel").exists(_.text == "edit")) {
+          l.attribute("href").headOption match {
+            case Some(veru) ⇒ Some(new URI(veru.text))
+            case _          ⇒ versionUri(links.tail)
+          }
+        } else versionUri(links.tail)
+      case _ ⇒ None
+    }
+
+    Future(http.client acquireAndGet { c ⇒
+      val exec: HttpRequestBase ⇒ HttpClient ⇒ ManagedResource[HttpResponse] =
+        refreshToken.fold({ req: HttpRequestBase ⇒
+          { c: HttpClient ⇒ c.execute(OAuthClient.prepare(req, accessToken)) }
+        }) { ref ⇒
+          { req: HttpRequestBase ⇒
+            { c: HttpClient ⇒
+              c.execute(OAuthClient.refreshable(req, accessToken,
+                ref.clientId, ref.clientSecret, ref.token))
+            }
+          }
+        }
+
+      cells.foldLeft(List.empty[URI]) { (l, cell) ⇒
+        val req = c.post(uri, cellXml(uri, cell), "application/atom+xml")
+        exec(req)(c) flatMap { r ⇒
+          if (r.getStatusLine.getStatusCode != 201 /* Created */ ) {
+            sys.error(s"Fails to create cell: $cell, cause: ${r.getStatusLine}")
+            // Will be pushed into wrapping ManagedResource
+          } else managed(new InputStreamReader(r.getEntity.getContent))
+        } map { r ⇒
+          val src = new InputSource(r)
+          src.setSystemId(uri.toString)
+          XML.load(src)
+        } acquireAndGet { xml ⇒
+          versionUri(xml \\ "link") match {
+            case Some(vu) ⇒ l :+ vu
+            case _ ⇒
+              sys.error(s"Fails to extract version URI: $xml")
+            // Will be pushed into wrapping ManagedResource
+          }
+        }
+      }
+    })
+  }
+
+  /**
+   * Changes cell in specified worksheet.
+   *
+   * @param id Spreadsheet ID
+   * @param index Worksheet index (first = 0)
+   * @param cells List of cells to be created
+   * @return List of version URI for each created cell
+   *
+   * {{{
+   * // Put "A" as content of cell at first row second column,
+   * // first worksheet of specified spreadsheet
+   * change("spreadsheetId", 0, List(CellValue(0, 1, "A")))
+   * }}}
+   */
+  def change(id: String, index: Int, cells: List[CellValue]): Future[List[URI]] = for {
+    v ← worksheet(id, index)
+    w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
+      s"No matching worksheet: $id, $index")))(Future.successful)
+    vs ← change(w.cellsUri, cells)
+  } yield vs
 
   // ---
 
-  import org.apache.http.client.methods.HttpRequestBase
-  import org.apache.http.message.BasicNameValuePair
+  /**
+   * @param uri Cells URI
+   * @param cell Cell value
+   */
+  @inline private def cellXml(uri: URI, cell: CellValue): String = {
+    val cellUrl = s"$uri/R${cell.row}C${cell.col}"
+    s"""<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"><id>$cellUrl</id><link rel="edit" type="application/atom+xml" href="$cellUrl"/><gs:cell row="${cell.row}" col="${cell.col}" inputValue="${cell.value}"/></entry>"""
+  }
 
   @inline private def rangeParams(fmt: String, range: WorksheetRange): List[NameValuePair] = range match {
     case WorksheetRange(Some(min), Some(max)) ⇒ List(
@@ -189,7 +362,13 @@ object Spreadsheet {
             case _                  ⇒ None
           }
       }
-    } yield SpreadsheetInfo(id, updated, title, s, w)
+      info ← try {
+        Some(SpreadsheetInfo(id, updated, title, new URI(s), new URI(w)))
+      } catch {
+        // Take care of malformed URI
+        case _: Throwable ⇒ None
+      }
+    } yield info
 
   /** Extracts worksheet information from given XML entry. */
   private[foorgol] def worksheetInfo(entry: Node): Option[WorksheetInfo] =
@@ -223,7 +402,13 @@ object Spreadsheet {
             case _                  ⇒ None
           }
       }
-    } yield WorksheetInfo(id, updated, title, s, c)
+      info ← try {
+        Some(WorksheetInfo(id, updated, title, new URI(s), new URI(c)))
+      } catch {
+        // Take care of malformed URI
+        case _: Throwable ⇒ None
+      }
+    } yield info
 
   /** Extracts cells from worksheet feed. */
   private[foorgol] def worksheetCells(feed: Elem): Option[WorksheetCells] = {
@@ -245,7 +430,12 @@ object Spreadsheet {
       }
       count ← (feed \ "totalResults").headOption.map(_.text.toInt)
       cells ← go((feed \ "entry"), Nil)
-    } yield WorksheetCells(count, batch, cells)
+      info ← try {
+        Some(WorksheetCells(count, new URI(batch), cells))
+      } catch {
+        case _: Throwable ⇒ None // Take care of malformed batch URI
+      }
+    } yield info
   }
 
   /** Extracts worksheet cell from given XML entry. */
@@ -278,21 +468,28 @@ object Spreadsheet {
       iv ← gsc.attribute("inputValue").headOption.map(_.text)
       r ← gsc.attribute("row").headOption.map(_.text.toInt)
       c ← gsc.attribute("col").headOption.map(_.text.toInt)
-    } yield WorksheetCell(id, title, s, e, r, c, iv)
+      info ← try {
+        Some(WorksheetCell(id, title, new URI(s), new URI(e), r, c, iv))
+      } catch {
+        case _: Throwable ⇒ None // Take care of malformed URIs
+      }
+    } yield info
 }
 
 case class SpreadsheetInfo(id: String, updated: Date, title: String,
-  selfUrl: String, worksheetsUrl: String)
+  selfUri: URI, worksheetsUri: URI)
 
 case class WorksheetInfo(id: String, updated: Date, title: String,
-  selfUrl: String, cellsUrl: String)
+  selfUri: URI, cellsUri: URI)
 
 case class WorksheetCells(
-  totalCount: Int, batchUrl: String, cells: List[WorksheetCell])
+  totalCount: Int, batchUri: URI, cells: List[WorksheetCell])
 
 case class WorksheetCell(id: String, title: String,
-  selfUrl: String, editUrl: String,
+  selfUri: URI, editUri: URI,
   row: Int, col: Int, value: String)
+
+case class CellValue(row: Int, col: Int, value: String)
 
 sealed trait WorksheetRange {
   def min: Option[Int]

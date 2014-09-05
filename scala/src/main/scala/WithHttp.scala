@@ -1,9 +1,11 @@
 package fr.applicius.foorgol
 
+import java.net.URI
+
 import org.apache.http.{ HttpResponse, NameValuePair }
+import org.apache.http.entity.StringEntity
 import org.apache.http.client.methods.{ HttpGet, HttpPost, HttpRequestBase }
 import org.apache.http.client.utils.URIBuilder
-import org.apache.http.client.entity.UrlEncodedFormEntity
 
 import resource.ManagedResource
 
@@ -18,16 +20,17 @@ trait HttpClient extends java.io.Closeable {
   def execute[R <: HttpRequestBase](request: OAuthClient.Refreshable[R]): ManagedResource[HttpResponse]
 
   /** Executes a GET request and returns its response. */
-  def get(url: String, parameters: List[NameValuePair] = Nil) = {
-    val builder = new URIBuilder(url)
-    builder.addParameters(parameters.asJava)
-    new HttpGet(builder.build)
-  }
+  def get(uri: URI, parameters: List[NameValuePair] = Nil) =
+    parameters.headOption.fold(new HttpGet(uri)) { _ ⇒
+      val builder = new URIBuilder(uri)
+      builder.addParameters(parameters.asJava)
+      new HttpGet(builder.build)
+    }
 
   /** Executes a POST request and returns its response. */
-  def post(url: String, parameters: List[NameValuePair]) = {
-    val ent = new UrlEncodedFormEntity(parameters.asJava, "UTF-8")
-    val post = new HttpPost(url)
+  def post(uri: URI, body: String, mimeType: String) = {
+    val ent = new StringEntity(body, mimeType, "UTF-8")
+    val post = new HttpPost(uri)
     post.setEntity(ent)
     post
   }

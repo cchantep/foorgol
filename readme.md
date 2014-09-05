@@ -43,6 +43,17 @@ import fr.applicius.foorgol.SpreadsheetInfo
 val spreadsheets: Future[List[SpreadsheetInfo]] = api.list
 ```
 
+**Find a single spreadsheet by ID**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.SpreadsheetInfo
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+val spreadsheet: Future[SpreadsheetInfo] = api.spreadsheet("anID")
+```
+
 **List all worksheets for a spreadsheet**
 
 ```scala
@@ -54,6 +65,86 @@ import fr.applicius.foorgol.WorksheetInfo
 
 val worksheets: Future[List[WorksheetInfo]] = 
   api.worksheets(sheet.worksheetsUrl)
+```
+
+**Find a single worksheet by spreadsheet ID and index**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.WorksheetInfo
+
+// api: fr.applicius.foorgol.Spreadsheet
+val firstWorksheet: Future[Option[WorksheetInfo]] = 
+  api.worksheet("spreadsheetId", 0)
+```
+
+**Custom process with worksheets of a specified spreadsheet**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.WorksheetInfo
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+// Find worksheet with matching title
+val matching: Future[Option[WorksheetInfo]] =
+  api.worksheet("spreadsheetId")(None: Option[WorksheetInfo]) { 
+    case (_, w @ WorksheetInfo(_, _, "Matching title", _, _)) => Left(Some(w)) 
+      // found some matching sheet, put it at final value in the `Left`
+    case (st, _) => Right(st)
+      // Not matching title so will look at other worksheets
+  }
+```
+
+**List cells by URI**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.WorksheetCells
+
+// api: fr.applicius.foorgol.Spreadsheet
+// work: fr.applicius.foorgol.WorksheetInfo
+
+val cells: Future[WorksheetCells] = api.cells(work.cellsUrl, None, None)
+```
+
+**List cells by spreadsheet ID and worksheet index**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.WorksheetCells
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+val cells: Future[WorksheetCells] = api.cells("spreadsheetId", 0)
+// All cells of first worksheet from specified spreadsheet
+```
+
+**Changing cells content by URI**
+
+```scala
+import scala.concurrent.Future
+
+// api: fr.applicius.foorgol.Spreadsheet
+// work: fr.applicius.foorgol.WorksheetInfo
+
+// Will change content for cells (4, 1) and (4, 3)
+val versionUrls: Future[List[String]] = api.change(work.cellsUrl, 
+  List(CellValue(4, 1, "4_1"), CellValue(4, 3, "4_3")))
+// These urls can be used for batch update
+```
+
+**Changing cells by spreadsheet ID and worksheet index**
+
+```scala
+import scala.concurrent.Future
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+// Will change content for cells (1, 1) and (1, 2),
+// in second worksheet of specified spreadsheet.
+val versionUrls: Future[List[String]] = api.change("spreadsheetId", 1, 
+  List(CellValue(1, 1, "1_1"), CellValue(1, 2, "1_2")))
 ```
 
 ## Requirements
