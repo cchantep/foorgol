@@ -1,0 +1,325 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>foorgol - fr.applicius.foorgol</title>
+          <meta name="description" content="foorgol - fr.applicius.foorgol" />
+          <meta name="keywords" content="foorgol fr.applicius.foorgol" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'fr.applicius.foorgol.package';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="value">
+      <div id="definition">
+        <img src="../../../lib/package_big.png" />
+        <p id="owner"><a href="../../package.html" class="extype" name="fr">fr</a>.<a href="../package.html" class="extype" name="fr.applicius">applicius</a></p>
+        <h1>foorgol</h1> <span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">package</span>
+      </span>
+      <span class="symbol">
+        <span class="name">foorgol</span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        
+        
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        <div id="types" class="types members">
+              <h3>Type Members</h3>
+              <ol><li name="fr.applicius.foorgol.CellValue" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="CellValueextendsProductwithSerializable"></a>
+      <a id="CellValue:CellValue"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="CellValue.html"><span class="name">CellValue</span></a><span class="params">(<span name="row">row: <span class="extype" name="scala.Int">Int</span></span>, <span name="col">col: <span class="extype" name="scala.Int">Int</span></span>, <span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@CellValueextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="fr.applicius.foorgol.HttpClient" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="HttpClientextendsCloseable"></a>
+      <a id="HttpClient:HttpClient"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="HttpClient.html"><span class="name">HttpClient</span></a><span class="result"> extends <span class="extype" name="java.io.Closeable">Closeable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@HttpClientextendsCloseable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">HTTP client abstraction.</p>
+    </li><li name="fr.applicius.foorgol.RefreshToken" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="RefreshTokenextendsProductwithSerializable"></a>
+      <a id="RefreshToken:RefreshToken"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="RefreshToken.html"><span class="name">RefreshToken</span></a><span class="params">(<span name="clientId">clientId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="clientSecret">clientSecret: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="token">token: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@RefreshTokenextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="fr.applicius.foorgol.Spreadsheet" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="SpreadsheetextendsAnyRef"></a>
+      <a id="Spreadsheet:Spreadsheet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="Spreadsheet.html"><span class="name">Spreadsheet</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@SpreadsheetextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Google spreadsheet DSL.</p>
+    </li><li name="fr.applicius.foorgol.SpreadsheetInfo" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="SpreadsheetInfoextendsProductwithSerializable"></a>
+      <a id="SpreadsheetInfo:SpreadsheetInfo"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="SpreadsheetInfo.html"><span class="name">SpreadsheetInfo</span></a><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="updated">updated: <span class="extype" name="java.util.Date">Date</span></span>, <span name="title">title: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="selfUri">selfUri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="worksheetsUri">worksheetsUri: <span class="extype" name="java.net.URI">URI</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@SpreadsheetInfoextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="fr.applicius.foorgol.WithHttp" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="WithHttpextendsAnyRef"></a>
+      <a id="WithHttp:WithHttp"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="WithHttp.html"><span class="name">WithHttp</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@WithHttpextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">HTTP commons functions.</p>
+    </li><li name="fr.applicius.foorgol.WorksheetCell" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WorksheetCellextendsProductwithSerializable"></a>
+      <a id="WorksheetCell:WorksheetCell"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="WorksheetCell.html"><span class="name">WorksheetCell</span></a><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="title">title: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="selfUri">selfUri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="editUri">editUri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="row">row: <span class="extype" name="scala.Int">Int</span></span>, <span name="col">col: <span class="extype" name="scala.Int">Int</span></span>, <span name="value">value: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@WorksheetCellextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="fr.applicius.foorgol.WorksheetCells" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WorksheetCellsextendsProductwithSerializable"></a>
+      <a id="WorksheetCells:WorksheetCells"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="WorksheetCells.html"><span class="name">WorksheetCells</span></a><span class="params">(<span name="totalCount">totalCount: <span class="extype" name="scala.Int">Int</span></span>, <span name="batchUri">batchUri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="cells">cells: <span class="extype" name="scala.List">List</span>[<a href="WorksheetCell.html" class="extype" name="fr.applicius.foorgol.WorksheetCell">WorksheetCell</a>]</span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@WorksheetCellsextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="fr.applicius.foorgol.WorksheetInfo" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WorksheetInfoextendsProductwithSerializable"></a>
+      <a id="WorksheetInfo:WorksheetInfo"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">case class</span>
+      </span>
+      <span class="symbol">
+        <a href="WorksheetInfo.html"><span class="name">WorksheetInfo</span></a><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="updated">updated: <span class="extype" name="java.util.Date">Date</span></span>, <span name="title">title: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="selfUri">selfUri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="cellsUri">cellsUri: <span class="extype" name="java.net.URI">URI</span></span>)</span><span class="result"> extends <span class="extype" name="scala.Product">Product</span> with <span class="extype" name="scala.Serializable">Serializable</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@WorksheetInfoextendsProductwithSerializable" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li><li name="fr.applicius.foorgol.WorksheetRange" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="WorksheetRangeextendsAnyRef"></a>
+      <a id="WorksheetRange:WorksheetRange"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">sealed </span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <a href="WorksheetRange.html"><span class="name">WorksheetRange</span></a><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@WorksheetRangeextendsAnyRef" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        <div id="values" class="values members">
+              <h3>Value Members</h3>
+              <ol><li name="fr.applicius.foorgol.HttpClient" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="HttpClient"></a>
+      <a id="HttpClient:HttpClient"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="HttpClient$.html"><span class="name">HttpClient</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@HttpClient" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Client companion.</p>
+    </li><li name="fr.applicius.foorgol.Spreadsheet" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="Spreadsheet"></a>
+      <a id="Spreadsheet:Spreadsheet"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="Spreadsheet$.html"><span class="name">Spreadsheet</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@Spreadsheet" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Companion for Spreadsheet DSL</p>
+    </li><li name="fr.applicius.foorgol.WorksheetRange" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="WorksheetRange"></a>
+      <a id="WorksheetRange:WorksheetRange"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">object</span>
+      </span>
+      <span class="symbol">
+        <a href="WorksheetRange$.html"><span class="name">WorksheetRange</span></a>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.package@WorksheetRange" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>

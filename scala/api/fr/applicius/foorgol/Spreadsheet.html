@@ -1,0 +1,714 @@
+<!DOCTYPE html >
+<html>
+        <head>
+          <title>Spreadsheet - fr.applicius.foorgol.Spreadsheet</title>
+          <meta name="description" content="Spreadsheet - fr.applicius.foorgol.Spreadsheet" />
+          <meta name="keywords" content="Spreadsheet fr.applicius.foorgol.Spreadsheet" />
+          <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+          
+      <link href="../../../lib/template.css" media="screen" type="text/css" rel="stylesheet" />
+      <link href="../../../lib/diagrams.css" media="screen" type="text/css" rel="stylesheet" id="diagrams-css" />
+      <script type="text/javascript" src="../../../lib/jquery.js" id="jquery-js"></script>
+      <script type="text/javascript" src="../../../lib/jquery-ui.js"></script>
+      <script type="text/javascript" src="../../../lib/template.js"></script>
+      <script type="text/javascript" src="../../../lib/tools.tooltip.js"></script>
+      
+      <script type="text/javascript">
+         if(top === self) {
+            var url = '../../../index.html';
+            var hash = 'fr.applicius.foorgol.Spreadsheet';
+            var anchor = window.location.hash;
+            var anchor_opt = '';
+            if (anchor.length >= 1)
+              anchor_opt = '@' + anchor.substring(1);
+            window.location.href = url + '#' + hash + anchor_opt;
+         }
+   	  </script>
+    
+        </head>
+        <body class="type">
+      <div id="definition">
+        <a href="Spreadsheet$.html" title="Go to companion"><img src="../../../lib/trait_to_object_big.png" /></a>
+        <p id="owner"><a href="../../package.html" class="extype" name="fr">fr</a>.<a href="../package.html" class="extype" name="fr.applicius">applicius</a>.<a href="package.html" class="extype" name="fr.applicius.foorgol">foorgol</a></p>
+        <h1><a href="Spreadsheet$.html" title="Go to companion">Spreadsheet</a></h1> <span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      </div>
+
+      <h4 id="signature" class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">trait</span>
+      </span>
+      <span class="symbol">
+        <span class="name">Spreadsheet</span><span class="result"> extends <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4>
+      
+          <div id="comment" class="fullcommenttop"><div class="comment cmt"><p>Google spreadsheet DSL.</p></div><dl class="attributes block"> <dt>Self Type</dt><dd><a href="" class="extype" name="fr.applicius.foorgol.Spreadsheet">Spreadsheet</a> with <a href="WithHttp.html" class="extype" name="fr.applicius.foorgol.WithHttp">WithHttp</a></dd></dl><div class="toggleContainer block">
+          <span class="toggle">Linear Supertypes</span>
+          <div class="superTypes hiddenContent"><span class="extype" name="scala.AnyRef">AnyRef</span>, <span class="extype" name="scala.Any">Any</span></div>
+        </div></div>
+        
+
+      <div id="mbrsel">
+        <div id="textfilter"><span class="pre"></span><span class="input"><input id="mbrsel-input" type="text" accesskey="/" /></span><span class="post"></span></div>
+        <div id="order">
+              <span class="filtertype">Ordering</span>
+              <ol>
+                
+                <li class="alpha in"><span>Alphabetic</span></li>
+                <li class="inherit out"><span>By inheritance</span></li>
+              </ol>
+            </div>
+        <div id="ancestors">
+                <span class="filtertype">Inherited<br />
+                </span>
+                <ol id="linearization">
+                  <li class="in" name="fr.applicius.foorgol.Spreadsheet"><span>Spreadsheet</span></li><li class="in" name="scala.AnyRef"><span>AnyRef</span></li><li class="in" name="scala.Any"><span>Any</span></li>
+                </ol>
+              </div><div id="ancestors">
+            <span class="filtertype"></span>
+            <ol>
+              <li class="hideall out"><span>Hide All</span></li>
+              <li class="showall in"><span>Show all</span></li>
+            </ol>
+            <a href="http://docs.scala-lang.org/overviews/scaladoc/usage.html#members" target="_blank">Learn more about member selection</a>
+          </div>
+        <div id="visbl">
+            <span class="filtertype">Visibility</span>
+            <ol><li class="public in"><span>Public</span></li><li class="all out"><span>All</span></li></ol>
+          </div>
+      </div>
+
+      <div id="template">
+        <div id="allMembers">
+        
+
+        
+
+        <div id="values" class="values members">
+              <h3>Abstract Value Members</h3>
+              <ol><li name="fr.applicius.foorgol.Spreadsheet#accessToken" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="accessToken:String"></a>
+      <a id="accessToken:String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">accessToken</span><span class="result">: <span class="extype" name="scala.Predef.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@accessToken:String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">OAuth access token</p>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#context" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="context:scala.concurrent.ExecutionContext"></a>
+      <a id="context:ExecutionContext"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">implicit abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">context</span><span class="result">: <span class="extype" name="scala.concurrent.ExecutionContext">ExecutionContext</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@context:scala.concurrent.ExecutionContext" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Execution context</p>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#refreshToken" visbl="pub" data-isabs="true" fullComment="no" group="Ungrouped">
+      <a id="refreshToken:Option[fr.applicius.foorgol.RefreshToken]"></a>
+      <a id="refreshToken:Option[RefreshToken]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">abstract </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">refreshToken</span><span class="result">: <span class="extype" name="scala.Option">Option</span>[<a href="RefreshToken.html" class="extype" name="fr.applicius.foorgol.RefreshToken">RefreshToken</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@refreshToken:Option[fr.applicius.foorgol.RefreshToken]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Can be used with offline access token, to refresh it.</p>
+    </li></ol>
+            </div>
+
+        <div id="values" class="values members">
+              <h3>Concrete Value Members</h3>
+              <ol><li name="scala.AnyRef#!=" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="!=(x$1:Any):Boolean"></a>
+      <a id="!=(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $bang$eq" class="name">!=</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@!=(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef###" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="##():Int"></a>
+      <a id="##():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $hash$hash" class="name">##</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@##():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#==" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="==(x$1:Any):Boolean"></a>
+      <a id="==(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span title="gt4s: $eq$eq" class="name">==</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@==(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="asInstanceOf[T0]:T0"></a>
+      <a id="asInstanceOf[T0]:T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">asInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Any.asInstanceOf.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@asInstanceOf[T0]:T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#cells" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cells(id:String,index:Int,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[fr.applicius.foorgol.WorksheetCells]"></a>
+      <a id="cells(String,Int,Option[WorksheetRange],Option[WorksheetRange]):Future[WorksheetCells]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cells</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="index">index: <span class="extype" name="scala.Int">Int</span></span>, <span name="rowRange">rowRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>] = <span class="symbol">None</span></span>, <span name="colRange">colRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>] = <span class="symbol">None</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="WorksheetCells.html" class="extype" name="fr.applicius.foorgol.WorksheetCells">WorksheetCells</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@cells(id:String,index:Int,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[fr.applicius.foorgol.WorksheetCells]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns matching cells, if any.</p><div class="fullcomment"><div class="comment cmt"><p>Returns matching cells, if any.
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index (first = 0)</p></dd><dt class="param">rowRange</dt><dd class="cmt"><p>Optional row range</p></dd><dt class="param">colRange</dt><dd class="cmt"><p>Optional column range</p><pre>cells(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>) <span class="cmt">// all cells of first worksheet</span></pre></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#cells" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cells(uri:java.net.URI,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[fr.applicius.foorgol.WorksheetCells]"></a>
+      <a id="cells(URI,Option[WorksheetRange],Option[WorksheetRange]):Future[WorksheetCells]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cells</span><span class="params">(<span name="uri">uri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="rowRange">rowRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>, <span name="colRange">colRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="WorksheetCells.html" class="extype" name="fr.applicius.foorgol.WorksheetCells">WorksheetCells</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@cells(uri:java.net.URI,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[fr.applicius.foorgol.WorksheetCells]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns list of cells from given URI (<a href="WorksheetInfo.html#cellsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#cellsUri">WorksheetInfo.cellsUri</a>).</p><div class="fullcomment"><div class="comment cmt"><p>Returns list of cells from given URI (<a href="WorksheetInfo.html#cellsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#cellsUri">WorksheetInfo.cellsUri</a>).
+</p></div><dl class="paramcmts block"><dt class="param">uri</dt><dd class="cmt"><p>Cells URI</p></dd><dt class="param">rowRange</dt><dd class="cmt"><p>Row range</p></dd><dt class="param">colRange</dt><dd class="cmt"><p>Column range
+</p></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#change" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="change(id:String,index:Int,cells:List[fr.applicius.foorgol.CellValue]):scala.concurrent.Future[List[java.net.URI]]"></a>
+      <a id="change(String,Int,List[CellValue]):Future[List[URI]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">change</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="index">index: <span class="extype" name="scala.Int">Int</span></span>, <span name="cells">cells: <span class="extype" name="scala.List">List</span>[<a href="CellValue.html" class="extype" name="fr.applicius.foorgol.CellValue">CellValue</a>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.List">List</span>[<span class="extype" name="java.net.URI">URI</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@change(id:String,index:Int,cells:List[fr.applicius.foorgol.CellValue]):scala.concurrent.Future[List[java.net.URI]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Changes cell in specified worksheet.</p><div class="fullcomment"><div class="comment cmt"><p>Changes cell in specified worksheet.
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index (first = 0)</p></dd><dt class="param">cells</dt><dd class="cmt"><p>List of cells to be created</p></dd><dt>returns</dt><dd class="cmt"><p>List of version URI for each created cell</p><pre><span class="cmt">// Put "A" as content of cell at first row second column,</span>
+<span class="cmt">// first worksheet of specified spreadsheet</span>
+change(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>, <span class="std">List</span>(CellValue(<span class="num">0</span>, <span class="num">1</span>, <span class="lit">"A"</span>)))</pre></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#change" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="change(uri:java.net.URI,cells:List[fr.applicius.foorgol.CellValue]):scala.concurrent.Future[List[java.net.URI]]"></a>
+      <a id="change(URI,List[CellValue]):Future[List[URI]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">change</span><span class="params">(<span name="uri">uri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="cells">cells: <span class="extype" name="scala.List">List</span>[<a href="CellValue.html" class="extype" name="fr.applicius.foorgol.CellValue">CellValue</a>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.List">List</span>[<span class="extype" name="java.net.URI">URI</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@change(uri:java.net.URI,cells:List[fr.applicius.foorgol.CellValue]):scala.concurrent.Future[List[java.net.URI]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Changes cells.</p><div class="fullcomment"><div class="comment cmt"><p>Changes cells. Any existing content will be overwrited .
+</p></div><dl class="paramcmts block"><dt class="param">uri</dt><dd class="cmt"><p>Cells URI (<a href="WorksheetInfo.html#cellsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#cellsUri">WorksheetInfo.cellsUri</a>)</p></dd><dt class="param">cells</dt><dd class="cmt"><p>List of cells to be created</p></dd><dt>returns</dt><dd class="cmt"><p>List of version URI for each created cell
+</p></dd></dl></div>
+    </li><li name="scala.AnyRef#clone" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="clone():Object"></a>
+      <a id="clone():AnyRef"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">clone</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.AnyRef">AnyRef</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@clone():Object" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.CloneNotSupportedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#eq" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="eq(x$1:AnyRef):Boolean"></a>
+      <a id="eq(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">eq</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@eq(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#equals" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="equals(x$1:Any):Boolean"></a>
+      <a id="equals(Any):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">equals</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Any">Any</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@equals(x$1:Any):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#finalize" visbl="prt" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="finalize():Unit"></a>
+      <a id="finalize():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">finalize</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@finalize():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Attributes</dt><dd>protected[<a href="../../../java$lang.html" class="extype" name="java.lang">java.lang</a>] </dd><dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="symbol">classOf[java.lang.Throwable]</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#getClass" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="getClass():Class[_]"></a>
+      <a id="getClass():Class[_]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">getClass</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.Class">Class</span>[_]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@getClass():Class[_]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#hashCode" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="hashCode():Int"></a>
+      <a id="hashCode():Int"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">hashCode</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Int">Int</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@hashCode():Int" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.Any#isInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <a id="isInstanceOf[T0]:Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">isInstanceOf</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@isInstanceOf[T0]:Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#list" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="list:scala.concurrent.Future[List[fr.applicius.foorgol.SpreadsheetInfo]]"></a>
+      <a id="list:Future[List[SpreadsheetInfo]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">list</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.List">List</span>[<a href="SpreadsheetInfo.html" class="extype" name="fr.applicius.foorgol.SpreadsheetInfo">SpreadsheetInfo</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@list:scala.concurrent.Future[List[fr.applicius.foorgol.SpreadsheetInfo]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns list of all available spreadsheets.</p>
+    </li><li name="scala.AnyRef#ne" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="ne(x$1:AnyRef):Boolean"></a>
+      <a id="ne(AnyRef):Boolean"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">ne</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.AnyRef">AnyRef</span></span>)</span><span class="result">: <span class="extype" name="scala.Boolean">Boolean</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@ne(x$1:AnyRef):Boolean" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notify" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notify():Unit"></a>
+      <a id="notify():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notify</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@notify():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#notifyAll" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="notifyAll():Unit"></a>
+      <a id="notifyAll():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">notifyAll</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@notifyAll():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#spreadsheet" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="spreadsheet(id:String):scala.concurrent.Future[fr.applicius.foorgol.SpreadsheetInfo]"></a>
+      <a id="spreadsheet(String):Future[SpreadsheetInfo]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">spreadsheet</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="SpreadsheetInfo.html" class="extype" name="fr.applicius.foorgol.SpreadsheetInfo">SpreadsheetInfo</a>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@spreadsheet(id:String):scala.concurrent.Future[fr.applicius.foorgol.SpreadsheetInfo]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns information for matching spreadsheet, if any.</p><div class="fullcomment"><div class="comment cmt"><p>Returns information for matching spreadsheet, if any.
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)
+</p></dd></dl></div>
+    </li><li name="scala.AnyRef#synchronized" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="synchronized[T0](x$1:=&gt;T0):T0"></a>
+      <a id="synchronized[T0](⇒T0):T0"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">synchronized</span><span class="tparams">[<span name="T0">T0</span>]</span><span class="params">(<span name="arg0">arg0: ⇒ <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>)</span><span class="result">: <span class="extype" name="java.lang.AnyRef.synchronized.T0">T0</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@synchronized[T0](x$1:=&gt;T0):T0" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd></dl></div>
+    </li><li name="scala.AnyRef#toString" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="toString():String"></a>
+      <a id="toString():String"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">toString</span><span class="params">()</span><span class="result">: <span class="extype" name="java.lang.String">String</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@toString():String" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait():Unit"></a>
+      <a id="wait():Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">()</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@wait():Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long,x$2:Int):Unit"></a>
+      <a id="wait(Long,Int):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>, <span name="arg1">arg1: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@wait(x$1:Long,x$2:Int):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="scala.AnyRef#wait" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="wait(x$1:Long):Unit"></a>
+      <a id="wait(Long):Unit"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier">final </span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">wait</span><span class="params">(<span name="arg0">arg0: <span class="extype" name="scala.Long">Long</span></span>)</span><span class="result">: <span class="extype" name="scala.Unit">Unit</span></span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@wait(x$1:Long):Unit" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef</dd><dt>Annotations</dt><dd>
+                <span class="name">@throws</span><span class="args">(<span>
+      
+      <span class="defval" name="classOf[java.lang.InterruptedException]">...</span>
+    </span>)</span>
+              
+        </dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#withWorksheets" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="withWorksheets[T](id:String)(z:T)(f:(T,fr.applicius.foorgol.WorksheetInfo)=&gt;Either[T,T]):scala.concurrent.Future[T]"></a>
+      <a id="withWorksheets[T](String)(T)((T,WorksheetInfo)⇒Either[T,T]):Future[T]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">withWorksheets</span><span class="tparams">[<span name="T">T</span>]</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="params">(<span name="z">z: <span class="extype" name="fr.applicius.foorgol.Spreadsheet.withWorksheets.T">T</span></span>)</span><span class="params">(<span name="f">f: (<span class="extype" name="fr.applicius.foorgol.Spreadsheet.withWorksheets.T">T</span>, <a href="WorksheetInfo.html" class="extype" name="fr.applicius.foorgol.WorksheetInfo">WorksheetInfo</a>) ⇒ <span class="extype" name="scala.Either">Either</span>[<span class="extype" name="fr.applicius.foorgol.Spreadsheet.withWorksheets.T">T</span>, <span class="extype" name="fr.applicius.foorgol.Spreadsheet.withWorksheets.T">T</span>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="fr.applicius.foorgol.Spreadsheet.withWorksheets.T">T</span>]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@withWorksheets[T](id:String)(z:T)(f:(T,fr.applicius.foorgol.WorksheetInfo)=&gt;Either[T,T]):scala.concurrent.Future[T]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Processes worksheets found for specified spreadsheet
+(<a href="SpreadsheetInfo.html#worksheetsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#worksheetsUri">SpreadsheetInfo.worksheetsUri</a>).</p><div class="fullcomment"><div class="comment cmt"><p>Processes worksheets found for specified spreadsheet
+(<a href="SpreadsheetInfo.html#worksheetsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#worksheetsUri">SpreadsheetInfo.worksheetsUri</a>).
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">z</dt><dd class="cmt"><p>Initial value for function <code>f</code></p></dd><dt class="param">f</dt><dd class="cmt"><p>Function given current state and extracted information. Must return either a final value at <code>Left</code> if must not look at other worksheets, or updated value at <code>Right</code> to go on processing worksheets.</p><pre><span class="cmt">// api: Spreadsheet</span>
+
+<span class="cmt">// Will find the second worksheet...</span>
+<span class="kw">val</span> second: Future[<span class="std">Option</span>[WorksheetInfo]] =
+  api.worksheet(<span class="lit">"spreadsheetId"</span>)(<span class="num">1</span> -&gt; <span class="std">None</span>) { (st, w) <span class="kw">=&gt;</span>
+  <span class="kw">val</span> (i, _) = st
+  <span class="kw">if</span> (i == <span class="num">2</span>) <span class="cmt">/* found some, so no next step */</span> Left(<span class="num">2</span> -&gt; <span class="std">Some</span>(w))
+  <span class="kw">else</span> Right(i+<span class="num">1</span> -&gt; <span class="std">None</span>)
+} map (_._2)</pre></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#worksheet" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="worksheet(id:String,index:Int):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetInfo]]"></a>
+      <a id="worksheet(String,Int):Future[Option[WorksheetInfo]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">worksheet</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="index">index: <span class="extype" name="scala.Int">Int</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<a href="WorksheetInfo.html" class="extype" name="fr.applicius.foorgol.WorksheetInfo">WorksheetInfo</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@worksheet(id:String,index:Int):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetInfo]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns worksheet from specified worksheet
+whose index in feed is given one, if any.</p><div class="fullcomment"><div class="comment cmt"><p>Returns worksheet from specified worksheet
+whose index in feed is given one, if any.
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index in underlying feed (first = 0)</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="#withWorksheets[T](id:String)(z:T)(f:(T,fr.applicius.foorgol.WorksheetInfo)=&gt;Either[T,T]):scala.concurrent.Future[T]" class="extmbr" name="fr.applicius.foorgol.Spreadsheet#withWorksheets">withWorksheets</a></p><pre><span class="kw">val</span> first: Future[<span class="std">Option</span>[WorksheetInfo]] =
+worksheet(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>)</pre></span></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#worksheets" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
+      <a id="worksheets(uri:java.net.URI):scala.concurrent.Future[List[fr.applicius.foorgol.WorksheetInfo]]"></a>
+      <a id="worksheets(URI):Future[List[WorksheetInfo]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">worksheets</span><span class="params">(<span name="uri">uri: <span class="extype" name="java.net.URI">URI</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.List">List</span>[<a href="WorksheetInfo.html" class="extype" name="fr.applicius.foorgol.WorksheetInfo">WorksheetInfo</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@worksheets(uri:java.net.URI):scala.concurrent.Future[List[fr.applicius.foorgol.WorksheetInfo]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns list of worksheets from given URI
+(<a href="SpreadsheetInfo.html#worksheetsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#worksheetsUri">SpreadsheetInfo.worksheetsUri</a>).</p>
+    </li></ol>
+            </div>
+
+        
+
+        
+        </div>
+
+        <div id="inheritedMembers">
+        <div class="parent" name="scala.AnyRef">
+              <h3>Inherited from <span class="extype" name="scala.AnyRef">AnyRef</span></h3>
+            </div><div class="parent" name="scala.Any">
+              <h3>Inherited from <span class="extype" name="scala.Any">Any</span></h3>
+            </div>
+        
+        </div>
+
+        <div id="groupedMembers">
+        <div class="group" name="Ungrouped">
+              <h3>Ungrouped</h3>
+              
+            </div>
+        </div>
+
+      </div>
+
+      <div id="tooltip"></div>
+
+      <div id="footer">  </div>
+
+
+    </body>
+      </html>
