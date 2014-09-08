@@ -58,6 +58,14 @@ trait Spreadsheet { http: WithHttp ⇒
   } yield info
 
   /**
+   * Returns list of worksheets for specified spreadsheet
+   *
+   * @param id Spreadsheet ID ([[SpreadsheetInfo.id]])
+   */
+  def worksheets(id: String): Future[List[WorksheetInfo]] =
+    withWorksheets(id)(List.empty[WorksheetInfo]) { (l, w) ⇒ Right(l :+ w) }
+
+  /**
    * Returns list of worksheets from given URI
    * ([[SpreadsheetInfo.worksheetsUri]]).
    */
@@ -114,9 +122,9 @@ trait Spreadsheet { http: WithHttp ⇒
     }
 
     for {
-      feed ← feed(_.get(new URI(
+      xml ← feed(_.get(new URI(
         s"https://spreadsheets.google.com/feeds/worksheets/$id/private/full")))
-      info ← Future(feed \\ "entry").flatMap(go(z, _))
+      info ← Future(xml \\ "entry").flatMap(go(z, _))
     } yield info
   }
 
@@ -124,7 +132,7 @@ trait Spreadsheet { http: WithHttp ⇒
    * Returns worksheet from specified worksheet
    * whose index in feed is given one, if any.
    *
-   * @param id Spreadsheet ID
+   * @param id Spreadsheet ID ([[SpreadsheetInfo.id]])
    * @param index Worksheet index in underlying feed (first = 0)
    * @see [[withWorksheets]]
    *
@@ -139,6 +147,21 @@ trait Spreadsheet { http: WithHttp ⇒
       case ((I, _), matching) ⇒ Left(0 -> Some(matching))
       case ((i, v), _)        ⇒ Right(i + 1 -> None)
     } map (_._2)
+  }
+
+  /**
+   * Returns worksheet matching given ID.
+   *
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param worksheetId Worksheet ID ([[WorksheetInfo.id]])
+   * @see [[withWorksheets]]
+   */
+  def worksheet(spreadsheetId: String, worksheetId: String): Future[Option[WorksheetInfo]] = {
+    val ID = worksheetId
+    withWorksheets(spreadsheetId)(None: Option[WorksheetInfo]) {
+      case (_, w @ WorksheetInfo(ID, _, _, _, _)) ⇒ Left(Some(w))
+      case (st, _)                                ⇒ Right(st)
+    }
   }
 
   /**
@@ -177,7 +200,7 @@ trait Spreadsheet { http: WithHttp ⇒
    * cells("spreadsheetId", 0) // all cells of first worksheet
    * }}}
    */
-  def cells(id: String, index: Int, rowRange: Option[WorksheetRange] = None, colRange: Option[WorksheetRange] = None): Future[WorksheetCells] = for {
+  def cells(id: String, index: Int, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[WorksheetCells] = for {
     v ← worksheet(id, index)
     w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
       s"No matching worksheet: $id, $index")))(Future.successful)
@@ -246,12 +269,12 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param id Spreadsheet ID
    * @param index Worksheet index (first = 0)
    * @param cells List of cells to be created
-   * @return List of version URI for each created cell
+   * @return List of version URIs for each created cell
    *
    * {{{
    * // Put "A" as content of cell at first row second column,
    * // first worksheet of specified spreadsheet
-   * change("spreadsheetId", 0, List(CellValue(0, 1, "A")))
+   * change("spreadsheetId", 0, List(CellValue(1, 2, "A")))
    * }}}
    */
   def change(id: String, index: Int, cells: List[CellValue]): Future[List[URI]] = for {
@@ -260,6 +283,58 @@ trait Spreadsheet { http: WithHttp ⇒
       s"No matching worksheet: $id, $index")))(Future.successful)
     vs ← change(w.cellsUri, cells)
   } yield vs
+
+  /**
+   * Changes cell in specified worksheet.
+   *
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param worksheetId Worksheet ID ([[WorksheetInfo.id]])
+   * @param cells List of cells to be created
+   * @return List of version URIs for each created cell
+   *
+   * {{{
+   * // Put "A" as content of cell at first row second column,
+   * // first worksheet of specified spreadsheet
+   * change("spreadsheetId", "worksheetId", List(CellValue(1, 2, "A")))
+   * }}}
+   */
+  def change(spreadsheetId: String, worksheetId: String, cells: List[CellValue]): Future[List[URI]] = for {
+    v ← worksheet(spreadsheetId, worksheetId)
+    w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
+      s"No matching worksheet: $spreadsheetId, $worksheetId")))(
+      Future.successful)
+    vs ← change(w.cellsUri, cells)
+  } yield vs
+
+  /*
+   * Inserts given values as uninterrupted sequence of cells in a new row
+   * at end of the specified worksheet.
+   *
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param worksheetId Worksheet ID ([[SpreadsheetInfo.id]])
+   * @param values Uninterrupted sequence of cell values
+   * @param List of version URIs for each created cell
+   *
+   * {{{
+   * // Put ("A", "B") in first and second columns or a new row
+   * // at end of specified worksheet
+   * append(spreadsheetId, worksheetId, List("A", "B"))
+   * }}}
+  def append(spreadsheetId: String, worksheetId: String, cells: List[String]): Future[List[URI]] = for {
+    v ← worksheet(spreadsheetId, worksheetId)
+    w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
+      s"No matching worksheet: $spreadsheetId, $worksheetId")))(
+      Future.successful)
+    wc ← this.cells(w.cellsUri,
+      Some(WorksheetRange.full(1, 1)), Some(WorksheetRange.full(1, 1)))
+    row = wc.totalCount + 1
+    values = cells.foldLeft(1 -> List.empty[CellValue]) { (st, c) ⇒
+      val (p, l) = st
+      p + 1 -> (l :+ CellValue(row, p, c))
+    }._2
+    vs ← change(w.cellsUri, values)
+  } yield vs
+   */
 
   // ---
 
@@ -479,17 +554,50 @@ object Spreadsheet {
 case class SpreadsheetInfo(id: String, updated: Date, title: String,
   selfUri: URI, worksheetsUri: URI)
 
-case class WorksheetInfo(id: String, updated: Date, title: String,
-  selfUri: URI, cellsUri: URI)
+/**
+ * Information about a single worksheet.
+ */
+case class WorksheetInfo(
+  /** Unique ID */
+  id: String,
 
+  /** Time it was last updated */
+  updated: Date,
+
+  /** Worksheet title */
+  title: String,
+
+  /** URI to locate this information */
+  selfUri: URI,
+
+  /** URI to locate worksheet content (cells feed) */
+  cellsUri: URI)
+
+/** Worksheet content (cells) */
 case class WorksheetCells(
-  totalCount: Int, batchUri: URI, cells: List[WorksheetCell])
+  /** Count of all rows in the worksheet */
+  totalCount: Int,
+
+  /** URI for batch update */
+  batchUri: URI,
+
+  /** Matching cells. */
+  cells: List[WorksheetCell])
 
 case class WorksheetCell(id: String, title: String,
   selfUri: URI, editUri: URI,
   row: Int, col: Int, value: String)
 
-case class CellValue(row: Int, col: Int, value: String)
+/** Cell content */
+case class CellValue(
+  /** Row position (first = 1) */
+  row: Int,
+
+  /** Column position (first = 1) */
+  col: Int,
+
+  /** Cell value */
+  value: String)
 
 sealed trait WorksheetRange {
   def min: Option[Int]

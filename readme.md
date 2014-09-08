@@ -57,7 +57,18 @@ import fr.applicius.foorgol.SpreadsheetInfo
 val spreadsheet: Future[SpreadsheetInfo] = api.spreadsheet("anID")
 ```
 
-**List all worksheets for a spreadsheet**
+**List worksheets by spreadsheet ID**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.WorksheetInfo
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+val worksheets: Future[List[WorksheetInfo]] = api.worksheets(spreadsheetId)
+```
+
+**List worksheets by URI**
 
 ```scala
 import scala.concurrent.Future
@@ -67,10 +78,10 @@ import fr.applicius.foorgol.WorksheetInfo
 // sheet: fr.applicius.foorgol.SpreadsheetInfo
 
 val worksheets: Future[List[WorksheetInfo]] = 
-  api.worksheets(sheet.worksheetsUrl)
+  api.worksheets(sheet.worksheetsUri)
 ```
 
-**Find a single worksheet by spreadsheet ID and index**
+**Find a single worksheet by spreadsheet ID and worksheet index**
 
 ```scala
 import scala.concurrent.Future
@@ -79,6 +90,17 @@ import fr.applicius.foorgol.WorksheetInfo
 // api: fr.applicius.foorgol.Spreadsheet
 val firstWorksheet: Future[Option[WorksheetInfo]] = 
   api.worksheet("spreadsheetId", 0)
+```
+
+**Find a single worksheet by spreadsheet ID and worksheet ID**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.WorksheetInfo
+
+// api: fr.applicius.foorgol.Spreadsheet
+val worksheet: Future[Option[WorksheetInfo]] = 
+  api.worksheet("spreadsheetId", "worksheetId")
 ```
 
 **Custom process with worksheets of a specified spreadsheet**
@@ -108,7 +130,7 @@ import fr.applicius.foorgol.WorksheetCells
 // api: fr.applicius.foorgol.Spreadsheet
 // work: fr.applicius.foorgol.WorksheetInfo
 
-val cells: Future[WorksheetCells] = api.cells(work.cellsUrl, None, None)
+val cells: Future[WorksheetCells] = api.cells(work.cellsUri, None, None)
 ```
 
 **List cells by spreadsheet ID and worksheet index**
@@ -132,7 +154,7 @@ import scala.concurrent.Future
 // work: fr.applicius.foorgol.WorksheetInfo
 
 // Will change content for cells (4, 1) and (4, 3)
-val versionUrls: Future[List[String]] = api.change(work.cellsUrl, 
+val versionUris: Future[List[String]] = api.change(work.cellsUri, 
   List(CellValue(4, 1, "4_1"), CellValue(4, 3, "4_3")))
 // These urls can be used for batch update
 ```
@@ -146,8 +168,22 @@ import scala.concurrent.Future
 
 // Will change content for cells (1, 1) and (1, 2),
 // in second worksheet of specified spreadsheet.
-val versionUrls: Future[List[String]] = api.change("spreadsheetId", 1, 
+val versionUris: Future[List[String]] = api.change("spreadsheetId", 1, 
   List(CellValue(1, 1, "1_1"), CellValue(1, 2, "1_2")))
+```
+
+**Changing cells by spreadsheet ID and worksheet ID**
+
+```scala
+import scala.concurrent.Future
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+// Will change content for cells (1, 1) and (1, 2),
+// in specified worksheet of specified spreadsheet.
+val versionUris: Future[List[String]] = 
+  api.change("spreadsheetId", "worksheetId", 
+    List(CellValue(1, 1, "1_1"), CellValue(1, 2, "1_2")))
 ```
 
 ## Requirements

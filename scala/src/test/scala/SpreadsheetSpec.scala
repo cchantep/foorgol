@@ -3,6 +3,7 @@ package fr.applicius.foorgol
 import java.net.URI
 
 import scala.util.Failure
+import scala.concurrent.duration.Duration
 
 object SpreadsheetSpec
     extends org.specs2.mutable.Specification with SpreadsheetFixtures {
@@ -36,7 +37,7 @@ object SpreadsheetSpec
   }
 
   "Worksheets" should {
-    "be successfully listed" in {
+    "be successfully listed by URI" in {
       var reqUri: String = null
       val mock = MockSpreadsheet("accessToken2", None) {
         MockHttpClient { req ⇒ reqUri = req.getURI.toString; resp2 }
@@ -72,6 +73,20 @@ object SpreadsheetSpec
             })
       }.await
     }
+
+    "be successfully listed by spreadsheet ID" in {
+      var reqUri: String = null
+      val mock = MockSpreadsheet("accessToken13", None) {
+        MockHttpClient { req ⇒ reqUri = req.getURI.toString; resp2 }
+      }
+
+      mock.worksheets("_spreadsheetId1").
+        aka("response") must beLike[List[WorksheetInfo]] {
+          case res ⇒
+            reqUri aka "request URI" must_== ("https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId1/private/full") and (
+              res aka "worksheets" must_== infos2)
+        }.await
+    }
   }
 
   "Single worksheet" should {
@@ -83,7 +98,7 @@ object SpreadsheetSpec
 
       mock.worksheet("_id3", 0) aka "response" must beSome[WorksheetInfo].
         which {
-          _ aka "second worksheet" must_== infos2(0) and (
+          _ aka "first worksheet" must_== infos2(0) and (
             reqUri aka "request URI" must_== "https://spreadsheets.google.com/feeds/worksheets/_id3/private/full")
         }.await
     }
@@ -94,6 +109,29 @@ object SpreadsheetSpec
       }
 
       mock.worksheet("_id3", 1) aka "response" must beNone.await
+    }
+
+    "be found by ID (od6)" in {
+      var reqUri: String = null
+      val mock = MockSpreadsheet("accessToken14", None) {
+        MockHttpClient { req ⇒ reqUri = req.getURI.toString; resp2 }
+      }
+
+      mock.worksheet("_spreadsheetId2", "od6").
+        aka("response") must beSome[WorksheetInfo].which {
+          _ aka "matching worksheet" must_== infos2(0) and (
+            reqUri aka "request URI" must_== "https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId2/private/full")
+        }.await
+    }
+
+    "not be found by ID (not_found)" in {
+      var reqUri: String = null
+      val mock = MockSpreadsheet("accessToken15", None) {
+        MockHttpClient { req ⇒ reqUri = req.getURI.toString; resp2 }
+      }
+
+      mock.worksheet("_spreadsheetId2", "not_found").
+        aka("response") must beNone.await
     }
   }
 
@@ -150,7 +188,7 @@ object SpreadsheetSpec
         MockHttpClient { req ⇒ reqs += req.getURI.toString; resp.next }
       }
 
-      mock.cells("_id5", 0, Some(WorksheetRange.openEnded(2))).
+      mock.cells("_id5", 0, Some(WorksheetRange.openEnded(2)), None).
         aka("response") must beLike[WorksheetCells] {
           case res ⇒
             reqs.toList aka "request URIs" must_== List(
@@ -213,9 +251,46 @@ object SpreadsheetSpec
 
       scala.concurrent.Await.result(
         mock.change("_id4", 1, List(CellValue(4, 3, "4_3"))),
-        scala.concurrent.duration.Duration(2, "s")).
+        Duration(2, "s")).
         aka("result") must throwA[IllegalArgumentException](
           "No matching worksheet: _id4, 1")
+
+    }
+
+    "be successfully applied for cells (4, 1) and (4, 3) in specified worksheet (od6)" in {
+      val resp = resp8
+      val bodys = scala.collection.mutable.MutableList.empty[String]
+      val mock = MockSpreadsheet("accessToken15", None) {
+        MockHttpClient {
+          case req: org.apache.http.client.methods.HttpPost ⇒
+            val buf = new java.io.ByteArrayOutputStream
+            req.getEntity.writeTo(buf)
+            bodys += new String(buf.toByteArray)
+
+            resp.next
+          case r ⇒ resp.next
+        }
+      }
+
+      mock.change("_spreadsheetId3", "od6", List(
+        CellValue(4, 1, "4_1"), CellValue(4, 3, "4_3"))).
+        aka("response") must beLike[List[URI]] {
+          case res ⇒
+            bodys.toList aka "requests" must_== body7 and (
+              res aka "version URI" must_== changes1)
+        }.await
+    }
+
+    "fail for cells with invalid worksheet ID (not_found)" in {
+      val mock = MockSpreadsheet("accessToken16", None) {
+        MockHttpClient { _ ⇒ resp2 }
+      }
+
+      scala.concurrent.Await.result(
+        mock.change("_spreadsheetId3", "not_found", 
+          List(CellValue(4, 3, "4_3"))), Duration(2, "s")).
+        aka("result") must throwA[IllegalArgumentException](
+          "No matching worksheet: _spreadsheetId3, not_found")
 
     }
   }
