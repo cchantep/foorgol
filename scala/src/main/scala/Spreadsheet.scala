@@ -223,21 +223,32 @@ trait Spreadsheet { http: WithHttp ⇒
    * }}}
    */
   def lastRow(spreadsheetId: String, worksheetId: String): Future[Option[WorksheetCells]] = for {
-    cxml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/basic"), "max-results" -> "1"))
-    last ← (cxml \ "totalResults").headOption.fold(Future.failed[String](
-      new IllegalArgumentException("Expecting openSearch:totalResults")))(r ⇒
-      Future(r.text))
-    batch ← (cxml \ "link").foldLeft[Option[String]](None) { (o, l) ⇒
-      if (l.attribute("rel").exists(
-        _.text == "http://schemas.google.com/g/2005#batch")) {
-        l.attribute("href").headOption.map(_.text)
-      } else o
-    }.fold(Future.failed[URI](new IllegalArgumentException(
-      "Expecting batch URI")))(s ⇒ Future(new URI(s)))
+    cxml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/basic"), "max-results" -> "1")).
+      map(Some(_)).recover[Option[Elem]] { case _ ⇒ None }
+    batch ← {
+      cxml.fold(worksheet(spreadsheetId, worksheetId).flatMap(_.fold(
+        Future.failed[String](new IllegalArgumentException(
+          s"Worksheet not found: $worksheetId ($spreadsheetId)")))(_ ⇒
+          Future.successful(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full/batch")))) { xml ⇒
+        (xml \ "link").foldLeft[Option[String]](None) { (o, l) ⇒
+          if (l.attribute("rel").exists(
+            _.text == "http://schemas.google.com/g/2005#batch")) {
+            l.attribute("href").headOption.map(_.text)
+          } else o
+        }.fold(Future.failed[String](new IllegalArgumentException(
+          "Batch URI not found")))(Future.successful(_))
+      }
+    }
+    buri ← Future(new URI(batch))
+    last ← cxml.fold(Future successful "0") { xml ⇒
+      (xml \ "totalResults").headOption.fold(Future.failed[String](
+        new IllegalArgumentException("Expecting openSearch:totalResults")))(r ⇒
+        Future(r.text))
+    }
     xml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), "start-index" -> last))
     row ← Future(Spreadsheet.cells(xml))
     count ← Future(last.toInt)
-  } yield row.map(WorksheetCells(count, batch, _))
+  } yield row.map(WorksheetCells(count, buri, _))
 
   /**
    * Changes cells. Any existing content will be overwrited .
@@ -416,13 +427,14 @@ trait Spreadsheet { http: WithHttp ⇒
           client.execute(OAuthClient.prepare(req, accessToken)))(ref ⇒
             client.execute(OAuthClient.refreshable(req, accessToken,
               ref.clientId, ref.clientSecret, ref.token)))
+        val uri = req.getURI.toString
         src ← if (resp.getStatusLine.getStatusCode == 200) {
           managed(new InputStreamReader(resp.getEntity.getContent)) map { r ⇒
             val src = new InputSource(r)
-            src.setSystemId(req.getURI.toString)
+            src.setSystemId(uri)
             src
           }
-        } else sys.error(s"Fails to get feed: ${resp.getStatusLine}")
+        } else sys.error(s"Fails to get feed: ${resp.getStatusLine} ($uri)")
       } yield src).acquireAndGet(XML.load)
     }
 }
