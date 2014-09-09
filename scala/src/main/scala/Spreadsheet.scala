@@ -5,9 +5,8 @@ import java.util.{ Date, Locale }
 import java.text.SimpleDateFormat
 import java.net.URI
 
-import org.apache.http.{ HttpResponse, NameValuePair }
+import org.apache.http.HttpResponse
 import org.apache.http.client.methods.HttpRequestBase
-import org.apache.http.message.BasicNameValuePair
 
 import scala.xml.{ Elem, InputSource, Node, XML }
 import scala.concurrent.{ ExecutionContext, Future }
@@ -171,21 +170,9 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param rowRange Row range
    * @param colRange Column range
    */
-  def cells(uri: URI, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[WorksheetCells] = for {
-    feed ← feed { client ⇒
-      val ps: List[NameValuePair] = (rowRange, colRange) match {
-        case (Some(rr), Some(cr)) ⇒
-          rangeParams("%s-row", rr) ++ rangeParams("%s-col", cr)
-        case (_, Some(cr)) ⇒ rangeParams("%s-col", cr)
-        case (Some(rr), _) ⇒ rangeParams("%s-row", rr)
-        case _             ⇒ Nil
-      }
-      client.get(uri, ps)
-    }
-    co ← Future(Spreadsheet.worksheetCells(feed))
-    cells ← co.fold[Future[WorksheetCells]](
-      Future.failed(new IllegalArgumentException(
-        s"Invalid cells feed: $feed")))(cs ⇒ Future.successful(cs))
+  def cells(uri: URI, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[Option[WorksheetCells]] = for {
+    xml ← feed(_.get(uri, cellRangeParams(rowRange, colRange): _*))
+    cells ← Future(Spreadsheet.worksheetCells(xml))
   } yield cells
 
   /**
@@ -197,15 +184,60 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param colRange Optional column range
    *
    * {{{
-   * cells("spreadsheetId", 0) // all cells of first worksheet
+   * cells("spreadsheetId", 0, None, None) // all cells of first worksheet
    * }}}
    */
-  def cells(id: String, index: Int, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[WorksheetCells] = for {
+  def cells(id: String, index: Int, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[Option[WorksheetCells]] = for {
     v ← worksheet(id, index)
     w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
       s"No matching worksheet: $id, $index")))(Future.successful)
     cs ← cells(w.cellsUri, rowRange, colRange)
   } yield cs
+
+  /**
+   * Returns matching cells, if any.
+   *
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param worksheetId Worksheet ID ([[WorksheetInfo.id]])
+   * @param rowRange Optional row range
+   * @param colRange Optional column range
+   *
+   * {{{
+   * cells("spreadsheetId", "worksheetId", None, None)
+   * }}}
+   */
+  def cells(spreadsheetId: String, worksheetId: String, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[Option[WorksheetCells]] =
+    for {
+      xml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), cellRangeParams(rowRange, colRange): _*))
+      cells ← Future(Spreadsheet.worksheetCells(xml))
+    } yield cells
+
+  /**
+   * Returns last row of specified worksheet, if any.
+   *
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param worksheetId Worksheet ID ([[WorksheetInfo.id]])
+   *
+   * {{{
+   * lastRow("spreadsheetId", "worksheetId")
+   * }}}
+   */
+  def lastRow(spreadsheetId: String, worksheetId: String): Future[Option[WorksheetCells]] = for {
+    cxml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/basic"), "max-results" -> "1"))
+    last ← (cxml \ "totalResults").headOption.fold(Future.failed[String](
+      new IllegalArgumentException("Expecting openSearch:totalResults")))(r ⇒
+      Future(r.text))
+    batch ← (cxml \ "link").foldLeft[Option[String]](None) { (o, l) ⇒
+      if (l.attribute("rel").exists(
+        _.text == "http://schemas.google.com/g/2005#batch")) {
+        l.attribute("href").headOption.map(_.text)
+      } else o
+    }.fold(Future.failed[URI](new IllegalArgumentException(
+      "Expecting batch URI")))(s ⇒ Future(new URI(s)))
+    xml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), "start-index" -> last))
+    row ← Future(Spreadsheet.cells(xml))
+    count ← Future(last.toInt)
+  } yield row.map(WorksheetCells(count, batch, _))
 
   /**
    * Changes cells. Any existing content will be overwrited .
@@ -298,15 +330,32 @@ trait Spreadsheet { http: WithHttp ⇒
    * change("spreadsheetId", "worksheetId", List(CellValue(1, 2, "A")))
    * }}}
    */
-  def change(spreadsheetId: String, worksheetId: String, cells: List[CellValue]): Future[List[URI]] = for {
-    v ← worksheet(spreadsheetId, worksheetId)
-    w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
-      s"No matching worksheet: $spreadsheetId, $worksheetId")))(
-      Future.successful)
-    vs ← change(w.cellsUri, cells)
+  def change(spreadsheetId: String, worksheetId: String, cells: List[CellValue]): Future[List[URI]] = change(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), cells)
+
+  /**
+   * Inserts given values as cells in a new row
+   * at end of the specified worksheet
+   * (after the last row containing a cell with some content).
+   *
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param worksheetId Worksheet ID ([[SpreadsheetInfo.id]])
+   * @param values Cell values with associated positions (first = 1)
+   * @param List of version URIs for each created cell
+   *
+   * {{{
+   * // Put (1 -> "A", 3 -> "C") in first and third columns or a new row
+   * // at end of specified worksheet
+   * append("spreadsheetId", "worksheetId", List(1 -> "A", 3 -> "C"))
+   * }}}
+   */
+  def append(spreadsheetId: String, worksheetId: String, values: List[(Int, String)]): Future[List[URI]] = for {
+    row ← lastRow(spreadsheetId, worksheetId)
+    newPos = row.fold(1)(_.cells.headOption.fold(1)(_.row + 1))
+    cells = values.map(v ⇒ CellValue(newPos, v._1, v._2))
+    vs ← change(spreadsheetId, worksheetId, cells)
   } yield vs
 
-  /*
+  /**
    * Inserts given values as uninterrupted sequence of cells in a new row
    * at end of the specified worksheet.
    *
@@ -318,23 +367,14 @@ trait Spreadsheet { http: WithHttp ⇒
    * {{{
    * // Put ("A", "B") in first and second columns or a new row
    * // at end of specified worksheet
-   * append(spreadsheetId, worksheetId, List("A", "B"))
+   * append("spreadsheetId", "worksheetId", "A", "B")
    * }}}
-  def append(spreadsheetId: String, worksheetId: String, cells: List[String]): Future[List[URI]] = for {
-    v ← worksheet(spreadsheetId, worksheetId)
-    w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
-      s"No matching worksheet: $spreadsheetId, $worksheetId")))(
-      Future.successful)
-    wc ← this.cells(w.cellsUri,
-      Some(WorksheetRange.full(1, 1)), Some(WorksheetRange.full(1, 1)))
-    row = wc.totalCount + 1
-    values = cells.foldLeft(1 -> List.empty[CellValue]) { (st, c) ⇒
-      val (p, l) = st
-      p + 1 -> (l :+ CellValue(row, p, c))
-    }._2
-    vs ← change(w.cellsUri, values)
-  } yield vs
    */
+  def append(spreadsheetId: String, worksheetId: String, values: String*): Future[List[URI]] = append(spreadsheetId, worksheetId,
+    values.foldLeft(1 -> List.empty[(Int, String)]) { (st, v) ⇒
+      val (i, l) = st
+      i + 1 -> (l :+ i -> v)
+    }._2)
 
   // ---
 
@@ -347,14 +387,23 @@ trait Spreadsheet { http: WithHttp ⇒
     s"""<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"><id>$cellUrl</id><link rel="edit" type="application/atom+xml" href="$cellUrl"/><gs:cell row="${cell.row}" col="${cell.col}" inputValue="${cell.value}"/></entry>"""
   }
 
-  @inline private def rangeParams(fmt: String, range: WorksheetRange): List[NameValuePair] = range match {
+  @inline private def cellRangeParams(rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): List[(String, String)] =
+    (rowRange, colRange) match {
+      case (Some(rr), Some(cr)) ⇒
+        rangeParams("%s-row", rr) ++ rangeParams("%s-col", cr)
+      case (_, Some(cr)) ⇒ rangeParams("%s-col", cr)
+      case (Some(rr), _) ⇒ rangeParams("%s-row", rr)
+      case _             ⇒ Nil
+    }
+
+  @inline private def rangeParams(fmt: String, range: WorksheetRange): List[(String, String)] = range match {
     case WorksheetRange(Some(min), Some(max)) ⇒ List(
-      new BasicNameValuePair(fmt.format("min"), min.toString),
-      new BasicNameValuePair(fmt.format("max"), max.toString))
+      fmt.format("min") -> min.toString,
+      fmt.format("max") -> max.toString)
     case WorksheetRange(_, Some(max)) ⇒
-      List(new BasicNameValuePair(fmt.format("max"), max.toString))
+      List(fmt.format("max") -> max.toString)
     case WorksheetRange(Some(min), _) ⇒
-      List(new BasicNameValuePair(fmt.format("min"), min.toString))
+      List(fmt.format("min") -> min.toString)
     case _ ⇒ Nil
   }
 
@@ -373,9 +422,7 @@ trait Spreadsheet { http: WithHttp ⇒
             src.setSystemId(req.getURI.toString)
             src
           }
-        } else {
-          sys.error(s"Fails to get feed: ${resp.getStatusLine}")
-        }
+        } else sys.error(s"Fails to get feed: ${resp.getStatusLine}")
       } yield src).acquireAndGet(XML.load)
     }
 }
@@ -485,8 +532,8 @@ object Spreadsheet {
       }
     } yield info
 
-  /** Extracts cells from worksheet feed. */
-  private[foorgol] def worksheetCells(feed: Elem): Option[WorksheetCells] = {
+  /** Extracts cell values from a cell feed */
+  private[foorgol] def cells(feed: Elem): Option[List[WorksheetCell]] = {
     @annotation.tailrec
     def go(entries: Seq[Node], cs: List[WorksheetCell]): Option[List[WorksheetCell]] = entries.headOption match {
       case Some(entry) ⇒ worksheetCell(entry) match {
@@ -496,6 +543,11 @@ object Spreadsheet {
       case _ ⇒ Some(cs)
     }
 
+    go(feed \ "entry", Nil)
+  }
+
+  /** Extracts worksheet cells from a cell feed. */
+  private[foorgol] def worksheetCells(feed: Elem): Option[WorksheetCells] = {
     for {
       batch ← (feed \ "link").foldLeft[Option[String]](None) { (o, l) ⇒
         if (l.attribute("rel").exists(
@@ -504,7 +556,7 @@ object Spreadsheet {
         } else o
       }
       count ← (feed \ "totalResults").headOption.map(_.text.toInt)
-      cells ← go((feed \ "entry"), Nil)
+      cells ← cells(feed)
       info ← try {
         Some(WorksheetCells(count, new URI(batch), cells))
       } catch {

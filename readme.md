@@ -12,7 +12,7 @@ Foorgol help integration of some of these features.
 
 ## Usage
 
-Foorgool can be used in SBT projects adding dependency `"fr.applicius.foorgol" % "java-client" % "1.0.1-SNAPSHOT"` or `"fr.applicius.foorgol" %% "scala" % "1.0.1-SNAPSHOT"` and having `"Applicius Snapshots" at "https://raw.github.com/applicius/mvn-repo/master/snapshots/"` in resolvers.
+Foorgool can be used in SBT projects adding dependency `"fr.applicius.foorgol" % "java-client" % "1.0.2-SNAPSHOT"` or `"fr.applicius.foorgol" %% "scala" % "1.0.2-SNAPSHOT"` and having `"Applicius Snapshots" at "https://raw.github.com/applicius/mvn-repo/master/snapshots/"` in resolvers.
 
 * Low-level [Java API](http://applicius.github.io/foorgol/java-client/api/)
 * [Scala API](http://applicius.github.io/foorgol/scala/api/#package)
@@ -121,7 +121,33 @@ val matching: Future[Option[WorksheetInfo]] =
   }
 ```
 
-**List cells by URI**
+**Read cells by spreadsheet ID and worksheet index**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.WorksheetCells
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+val cells: Future[Option[WorksheetCells]] = 
+  api.cells("spreadsheetId", 0, None, None)
+// All cells of first worksheet from specified spreadsheet
+```
+
+**Read cells by spreadsheet ID and worksheet ID**
+
+```scala
+import scala.concurrent.Future
+import fr.applicius.foorgol.WorksheetCells
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+val cells: Future[Option[WorksheetCells]] = 
+  api.cells("spreadsheetId", "worksheetId", None, None)
+// All cells of specified worksheet
+```
+
+**Read cells by URI**
 
 ```scala
 import scala.concurrent.Future
@@ -130,10 +156,10 @@ import fr.applicius.foorgol.WorksheetCells
 // api: fr.applicius.foorgol.Spreadsheet
 // work: fr.applicius.foorgol.WorksheetInfo
 
-val cells: Future[WorksheetCells] = api.cells(work.cellsUri, None, None)
+val cells: Future[Option[WorksheetCells]] = api.cells(work.cellsUri, None, None)
 ```
 
-**List cells by spreadsheet ID and worksheet index**
+**Get last row by spreadsheet ID and worksheet ID**
 
 ```scala
 import scala.concurrent.Future
@@ -141,8 +167,8 @@ import fr.applicius.foorgol.WorksheetCells
 
 // api: fr.applicius.foorgol.Spreadsheet
 
-val cells: Future[WorksheetCells] = api.cells("spreadsheetId", 0)
-// All cells of first worksheet from specified spreadsheet
+val last: Future[Option[WorksheetCells]] = 
+  api.lastRow("spreadsheetId", "worksheetId")
 ```
 
 **Changing cells content by URI**
@@ -185,6 +211,34 @@ val versionUris: Future[List[String]] =
   api.change("spreadsheetId", "worksheetId", 
     List(CellValue(1, 1, "1_1"), CellValue(1, 2, "1_2")))
 ```
+
+**Append cells at end of specified worksheet**
+
+```scala
+import scala.concurrent.Future
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+// Append a row with first cell "A" and third one "C"
+val versionUris: Future[List[String]] = 
+  api.append("spreadsheetId", "worksheetId", List(
+    1 -> "A", 3 -> "C"))
+```
+
+**Append row at end of specified worksheet**
+
+```scala
+import scala.concurrent.Future
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+// Append a row with contiguous cells ("A", "B", "C")
+val versionUris: Future[List[String]] = 
+  api.append("spreadsheetId", "worksheetId", "A", "B", "C")
+```
+
+> Given values are assumed to be contiguous.
+> Other `.append(spreadsheetId: String, worksheetId: String, values: List[(Int, String)])` must be prefered.
 
 ## Requirements
 

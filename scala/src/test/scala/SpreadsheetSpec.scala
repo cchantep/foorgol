@@ -143,10 +143,9 @@ object SpreadsheetSpec
       }
 
       mock.cells(new URI("http://cells-uri"), None, None).
-        aka("response") must beLike[WorksheetCells] {
-          case res ⇒
-            reqUri aka "request URI" must_== "http://cells-uri" and (
-              res aka "cells" must_== cells1)
+        aka("response") must beSome[WorksheetCells].which { res ⇒
+          reqUri aka "request URI" must_== "http://cells-uri" and (
+            res aka "cells" must_== cells1)
         }.await
     }
 
@@ -156,13 +155,12 @@ object SpreadsheetSpec
         MockHttpClient { req ⇒ reqUri = req.getURI.toString; resp4 }
       }
 
-      mock.cells(new URI("http://cells-uri"), 
+      mock.cells(new URI("http://cells-uri"),
         Some(WorksheetRange.full(1, 2)), None).
-        aka("response") must beLike[WorksheetCells] {
-          case res ⇒
-            reqUri aka "request URI" mustEqual (
-              "http://cells-uri?min-row=1&max-row=2") and (
-                res aka "cells" must_== cells2)
+        aka("response") must beSome[WorksheetCells].which { res ⇒
+          reqUri aka "request URI" mustEqual (
+            "http://cells-uri?min-row=1&max-row=2") and (
+              res aka "cells" must_== cells2)
         }.await
     }
 
@@ -174,10 +172,9 @@ object SpreadsheetSpec
 
       mock.cells(new URI("http://cells-uri"),
         None, Some(WorksheetRange.openStarted(1))).
-        aka("response") must beLike[WorksheetCells] {
-          case res ⇒
-            reqUri aka "request URI" mustEqual (
-              "http://cells-uri?max-col=1") and (res aka "cells" must_== cells3)
+        aka("response") must beSome[WorksheetCells].which { res ⇒
+          reqUri aka "request URI" mustEqual (
+            "http://cells-uri?max-col=1") and (res aka "cells" must_== cells3)
         }.await
     }
 
@@ -189,10 +186,33 @@ object SpreadsheetSpec
       }
 
       mock.cells("_id5", 0, Some(WorksheetRange.openEnded(2)), None).
-        aka("response") must beLike[WorksheetCells] {
-          case res ⇒
-            reqs.toList aka "request URIs" must_== List(
-              "https://spreadsheets.google.com/feeds/worksheets/_id5/private/full", "https://spreadsheets.google.com/feeds/cells/178A6E9A-34EB-435E-B483-61E2169AEB79/od6/private/full?min-row=2") and (res aka "cells" must_== cells2)
+        aka("response") must beSome[WorksheetCells].which { res ⇒
+          reqs.toList aka "request URIs" must_== List(
+            "https://spreadsheets.google.com/feeds/worksheets/_id5/private/full", "https://spreadsheets.google.com/feeds/cells/178A6E9A-34EB-435E-B483-61E2169AEB79/od6/private/full?min-row=2") and (res aka "cells" must_== cells2)
+        }.await
+    }
+
+    "be successfully found by spreadsheet ID and worksheet ID with a full column range" in {
+      var reqUri: String = null
+      val mock = MockSpreadsheet("accessToken16", None) {
+        MockHttpClient { req ⇒ reqUri = req.getURI.toString; resp5 }
+      }
+
+      mock.cells("_spreadsheetId4", "_worksheetId1", None, Some(WorksheetRange.full(1, 2))).
+        aka("response") must beSome[WorksheetCells].which { res ⇒
+          reqUri aka "request URI" must_== ("https://spreadsheets.google.com/feeds/cells/_spreadsheetId4/_worksheetId1/private/full?min-col=1&max-col=2") and (res aka "cells" must_== cells3)
+        }.await
+    }
+
+    "be found for last row of specified worksheet" in {
+      val reqs = scala.collection.mutable.MutableList.empty[String]
+      val mock = MockSpreadsheet("accessToken17", None) {
+        MockHttpClient { req ⇒ reqs += req.getURI.toString; resp5 }
+      }
+
+      mock.lastRow("_spreadsheetId5", "_worksheetId2").
+        aka("response") must beSome[WorksheetCells].which { res ⇒
+          reqs.toList aka "request URIs" must_== List("https://spreadsheets.google.com/feeds/cells/_spreadsheetId5/_worksheetId2/private/basic?max-results=1", "https://spreadsheets.google.com/feeds/cells/_spreadsheetId5/_worksheetId2/private/full?start-index=5") and (res aka "cells" must_== cells3)
         }.await
     }
   }
@@ -258,7 +278,7 @@ object SpreadsheetSpec
     }
 
     "be successfully applied for cells (4, 1) and (4, 3) in specified worksheet (od6)" in {
-      val resp = resp8
+      val resp = resp6
       val bodys = scala.collection.mutable.MutableList.empty[String]
       val mock = MockSpreadsheet("accessToken15", None) {
         MockHttpClient {
@@ -276,22 +296,51 @@ object SpreadsheetSpec
         CellValue(4, 1, "4_1"), CellValue(4, 3, "4_3"))).
         aka("response") must beLike[List[URI]] {
           case res ⇒
-            bodys.toList aka "requests" must_== body7 and (
+            bodys.toList aka "requests" must_== body9 and (
               res aka "version URI" must_== changes1)
         }.await
     }
 
     "fail for cells with invalid worksheet ID (not_found)" in {
       val mock = MockSpreadsheet("accessToken16", None) {
-        MockHttpClient { _ ⇒ resp2 }
+        MockHttpClient(_ ⇒ badRequest)
       }
 
       scala.concurrent.Await.result(
-        mock.change("_spreadsheetId3", "not_found", 
+        mock.change("_spreadsheetId3", "not_found",
           List(CellValue(4, 3, "4_3"))), Duration(2, "s")).
-        aka("result") must throwA[IllegalArgumentException](
-          "No matching worksheet: _spreadsheetId3, not_found")
+        aka("result") must throwA[RuntimeException].like {
+          case e ⇒ e.getMessage aka "error" must startWith(
+            "Fails to create cell: CellValue(4,3,4_3)")
+        }
+    }
 
+    "append a new row at end of specified worksheet" in {
+      val resp = resp10
+      val reqs = scala.collection.mutable.MutableList.empty[String]
+      var body: String = null
+      val mock = MockSpreadsheet("accessToken18", None) {
+        MockHttpClient {
+          case post: org.apache.http.client.methods.HttpPost ⇒
+            val buf = new java.io.ByteArrayOutputStream
+            post.getEntity.writeTo(buf)
+
+            body = new String(buf.toByteArray)
+            reqs += post.getURI.toString
+
+            resp.next
+          case req ⇒ reqs += req.getURI.toString; resp.next
+        }
+      }
+
+      mock.append("_spreadsheetId6", "_worksheetId3", "appended").
+        aka("response") must beLike[List[URI]] {
+          case res ⇒
+            reqs.toList aka "request URIs" must_== List(
+              "https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/basic?max-results=1", "https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full?start-index=5", "https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full") and (
+                body aka "append request body" must_== body10) and (
+                  res aka "version URI" must_== List(new URI("https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R4C1/7clm")))
+        }.await
     }
   }
 }
@@ -517,4 +566,30 @@ sealed trait SpreadsheetFixtures {
   def body7 = List("""<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"><id>https://spreadsheets.google.com/feeds/cells/178A6E9A-34EB-435E-B483-61E2169AEB79/od6/private/full/R4C1</id><link rel="edit" type="application/atom+xml" href="https://spreadsheets.google.com/feeds/cells/178A6E9A-34EB-435E-B483-61E2169AEB79/od6/private/full/R4C1"/><gs:cell row="4" col="1" inputValue="4_1"/></entry>""", """<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"><id>https://spreadsheets.google.com/feeds/cells/178A6E9A-34EB-435E-B483-61E2169AEB79/od6/private/full/R4C3</id><link rel="edit" type="application/atom+xml" href="https://spreadsheets.google.com/feeds/cells/178A6E9A-34EB-435E-B483-61E2169AEB79/od6/private/full/R4C3"/><gs:cell row="4" col="3" inputValue="4_3"/></entry>""")
 
   def resp9 = List(resp2, resp4).iterator
+
+  val body9 = List("""<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId3/od6/private/full/R4C1</id><link rel="edit" type="application/atom+xml" href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId3/od6/private/full/R4C1"/><gs:cell row="4" col="1" inputValue="4_1"/></entry>""", """<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId3/od6/private/full/R4C3</id><link rel="edit" type="application/atom+xml" href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId3/od6/private/full/R4C3"/><gs:cell row="4" col="3" inputValue="4_3"/></entry>""")
+
+  val badRequest = new BasicHttpResponse(
+    new BasicStatusLine(httpProto, 400, "Bad Request"))
+
+  def resp10 = {
+    val ent1 = new StringEntity("""<feed xmlns:batch="http://schemas.google.com/gdata/batch" xmlns:gs="http://schemas.google.com/spreadsheets/2006" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns="http://www.w3.org/2005/Atom"><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full</id><updated>2014-08-28T18:32:54.266Z</updated><category term="http://schemas.google.com/spreadsheets/2006#cell" scheme="http://schemas.google.com/spreadsheets/2006"/><title type="text">1.Sheet</title><link href="https://docs.google.com/spreadsheets/d/_spreadsheetId6/edit" type="application/atom+xml" rel="alternate"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full" type="application/atom+xml" rel="http://schemas.google.com/g/2005#feed"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full" type="application/atom+xml" rel="http://schemas.google.com/g/2005#post"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/batch" type="application/atom+xml" rel="http://schemas.google.com/g/2005#batch"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full" type="application/atom+xml" rel="self"/><author><name>google</name><email>google@applicius.fr</email></author><openSearch:totalResults>5</openSearch:totalResults><openSearch:startIndex>1</openSearch:startIndex><gs:rowCount>1000</gs:rowCount><gs:colCount>26</gs:colCount><entry><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R1C1</id><updated>2014-08-28T18:32:54.266Z</updated><category term="http://schemas.google.com/spreadsheets/2006#cell" scheme="http://schemas.google.com/spreadsheets/2006"/><title type="text">A1</title><content type="text">X</content><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R1C1" type="application/atom+xml" rel="self"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R1C1/2g" type="application/atom+xml" rel="edit"/><gs:cell inputValue="Val.1" col="1" row="1">Val.1</gs:cell></entry></feed>""")
+    val respA = new BasicHttpResponse(new BasicStatusLine(httpProto, 200, "OK"))
+    respA.setEntity(ent1)
+
+    val ent2 = new StringEntity("""<feed xmlns:batch="http://schemas.google.com/gdata/batch" xmlns:gs="http://schemas.google.com/spreadsheets/2006" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns="http://www.w3.org/2005/Atom"><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full</id><updated>2014-08-28T18:32:54.266Z</updated><category term="http://schemas.google.com/spreadsheets/2006#cell" scheme="http://schemas.google.com/spreadsheets/2006"/><title type="text">1.Sheet</title><link href="https://docs.google.com/spreadsheets/d/_spreadsheetId6/edit" type="application/atom+xml" rel="alternate"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full" type="application/atom+xml" rel="http://schemas.google.com/g/2005#feed"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full" type="application/atom+xml" rel="http://schemas.google.com/g/2005#post"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/batch" type="application/atom+xml" rel="http://schemas.google.com/g/2005#batch"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full" type="application/atom+xml" rel="self"/><author><name>google</name><email>google@applicius.fr</email></author><openSearch:totalResults>5</openSearch:totalResults><openSearch:startIndex>1</openSearch:startIndex><gs:rowCount>1000</gs:rowCount><gs:colCount>26</gs:colCount><entry><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R3C1</id><updated>2014-08-28T18:32:54.266Z</updated><category term="http://schemas.google.com/spreadsheets/2006#cell" scheme="http://schemas.google.com/spreadsheets/2006"/><title type="text">A3</title><content type="text">Pouet</content><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R3C1" type="application/atom+xml" rel="self"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R3C1/19y351" type="application/atom+xml" rel="edit"/><gs:cell inputValue="Test 5" col="1" row="3">Test 5</gs:cell></entry></feed>""")
+    val respB = new BasicHttpResponse(new BasicStatusLine(httpProto, 200, "OK"))
+    respB.setEntity(ent2)
+
+    val ent3 = new StringEntity("""<?xml version='1.0' encoding='UTF-8'?><entry xmlns='http://www.w3.org/2005/Atom' xmlns:gs='http://schemas.google.com/spreadsheets/2006' xmlns:batch='http://schemas.google.com/gdata/batch'><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R4C1</id><updated>2014-08-28T18:32:54.266Z</updated><category scheme='http://schemas.google.com/spreadsheets/2006' term='http://schemas.google.com/spreadsheets/2006#cell'/><title type='text'>A4</title><content type='text'>appended</content><link rel='self' type='application/atom+xml' href='https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R4C1'/><link rel='edit' type='application/atom+xml' href='https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R4C1/7clm'/><gs:cell row='4' col='1' inputValue='appended'>appended</gs:cell></entry>""")
+
+    val respC = new BasicHttpResponse(
+      new BasicStatusLine(httpProto, 201, "Created"))
+
+    respC.setEntity(ent3)
+
+    List(respA, respB, respC).iterator
+  }
+
+  val body10 = """<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R4C1</id><link rel="edit" type="application/atom+xml" href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R4C1"/><gs:cell row="4" col="1" inputValue="appended"/></entry>"""
 }

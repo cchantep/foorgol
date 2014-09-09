@@ -4,6 +4,7 @@ import java.net.URI
 
 import org.apache.http.{ HttpResponse, NameValuePair }
 import org.apache.http.entity.StringEntity
+import org.apache.http.message.BasicNameValuePair
 import org.apache.http.client.methods.{ HttpGet, HttpPost, HttpRequestBase }
 import org.apache.http.client.utils.URIBuilder
 
@@ -20,10 +21,11 @@ trait HttpClient extends java.io.Closeable {
   def execute[R <: HttpRequestBase](request: OAuthClient.Refreshable[R]): ManagedResource[HttpResponse]
 
   /** Executes a GET request and returns its response. */
-  def get(uri: URI, parameters: List[NameValuePair] = Nil) =
+  def get(uri: URI, parameters: (String, String)*) =
     parameters.headOption.fold(new HttpGet(uri)) { _ ⇒
       val builder = new URIBuilder(uri)
-      builder.addParameters(parameters.asJava)
+      builder.addParameters(parameters.map(p ⇒
+        new BasicNameValuePair(p._1, p._2): NameValuePair).asJava)
       new HttpGet(builder.build)
     }
 

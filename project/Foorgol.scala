@@ -9,7 +9,7 @@ object Foorgol extends Build {
   lazy val root = Project(id = "foorgol", base = file(".")).
     settings(
       organization in ThisBuild := "fr.applicius.foorgol",
-      version in ThisBuild := "1.0.1-SNAPSHOT",
+      version in ThisBuild := "1.0.2-SNAPSHOT",
       scalaVersion in ThisBuild := "2.11.2").
     aggregate(java, scala)
 }
