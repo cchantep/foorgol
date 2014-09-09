@@ -1,4 +1,4 @@
-name := "foorgol-java"
+name := "java-client"
 
 javaOptions += "-deprecation"
 
