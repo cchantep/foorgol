@@ -12,7 +12,7 @@ Foorgol help integration of some of these features.
 
 ## Usage
 
-Foorgool can be used in SBT projects adding dependency `"fr.applicius.foorgol" % "java-client" % "1.0.3-SNAPSHOT"` or `"fr.applicius.foorgol" %% "scala" % "1.0.3-SNAPSHOT"` and having `"Applicius Snapshots" at "https://raw.github.com/applicius/mvn-repo/master/snapshots/"` in resolvers.
+Foorgool can be used in SBT projects adding dependency `"fr.applicius.foorgol" % "java-client" % "1.0.4-SNAPSHOT"` or `"fr.applicius.foorgol" %% "scala" % "1.0.4-SNAPSHOT"` and having `"Applicius Snapshots" at "https://raw.github.com/applicius/mvn-repo/master/snapshots/"` in resolvers.
 
 * Low-level [Java API](http://applicius.github.io/foorgol/java-client/api/)
 * [Scala API](http://applicius.github.io/foorgol/scala/api/#package)

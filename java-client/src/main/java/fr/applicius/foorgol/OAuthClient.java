@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.Header;
 
 import org.apache.http.message.BasicNameValuePair;
 
@@ -235,9 +236,18 @@ public class OAuthClient {
 
                 logger.log(Level.FINER, "Initial status code: {0}", statusCode);
 
-                if (statusCode >= 200 && statusCode < 300) {
+                final Header contentLength = 
+                    resp.getFirstHeader("Content-Length");
+
+                final String len = (contentLength == null) ? "" 
+                    : contentLength.getValue();
+
+                final boolean successful = 
+                    (statusCode >= 200 && statusCode < 300);
+
+                if (successful && !"0".equals(len)) {
                     return ImmutablePair.of(this.accessToken, resp);
-                } else if (statusCode == 401) {
+                } else if (successful || statusCode == 401) {
                     logger.warning("Will try to execute with refreshed token");
 
                     resp.close();

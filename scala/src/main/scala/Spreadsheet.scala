@@ -491,21 +491,24 @@ trait Spreadsheet { http: WithHttp ⇒
     Future {
       (for {
         client ← http.client
-        val req = r(client)
+        req = r(client)
         res ← refreshToken.fold[ManagedResource[(String, HttpResponse)]](
           client.execute(OAuthClient.prepare(req, accessToken)).map(x ⇒
             accessToken -> x))(ref ⇒
             client.execute(OAuthClient.refreshable(req, accessToken,
               ref.clientId, ref.clientSecret, ref.token)))
-        val uri = req.getURI.toString
-        val resp = res._2
-        src ← if (resp.getStatusLine.getStatusCode == 200) {
-          managed(new InputStreamReader(resp.getEntity.getContent)) map { r ⇒
-            val src = new InputSource(r)
-            src.setSystemId(uri)
-            src
-          }
-        } else sys.error(s"Fails to get feed: ${resp.getStatusLine} ($uri)")
+        uri = req.getURI.toString
+        src ← {
+          val resp = res._2
+
+          if (resp.getStatusLine.getStatusCode == 200) {
+            managed(new InputStreamReader(resp.getEntity.getContent)) map { r ⇒
+              val src = new InputSource(r)
+              src.setSystemId(uri)
+              src
+            }
+          } else sys.error(s"Fails to get feed: ${resp.getStatusLine} ($uri)")
+        }
       } yield res._1 -> src) acquireAndGet { d ⇒
         val (tok, src) = d
         tok -> XML.load(src)
