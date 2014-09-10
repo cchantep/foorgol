@@ -37,8 +37,8 @@ trait Spreadsheet { http: WithHttp ⇒
     }
 
     for {
-      feed ← feed(_ ⇒ SpreadsheetClient.listRequest)
-      infos ← Future(feed \\ "entry").flatMap(go(_, Nil))
+      (_, xml) ← feed(_ ⇒ SpreadsheetClient.listRequest)
+      infos ← Future(xml \\ "entry").flatMap(go(_, Nil))
     } yield infos
   }
 
@@ -48,9 +48,9 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param id Spreadsheet ID ([[SpreadsheetInfo.id]])
    */
   def spreadsheet(id: String): Future[SpreadsheetInfo] = for {
-    feed ← feed(_.get(new URI(
+    (_, xml) ← feed(_.get(new URI(
       s"https://spreadsheets.google.com/feeds/spreadsheets/$id")))
-    info ← (feed \\ "entry").headOption.flatMap(Spreadsheet.spreadsheetInfo).
+    info ← (xml \\ "entry").headOption.flatMap(Spreadsheet.spreadsheetInfo).
       fold(Future.failed[SpreadsheetInfo](
         new RuntimeException(s"Invalid spreadsheet entry")))(
         Future.successful(_))
@@ -80,8 +80,8 @@ trait Spreadsheet { http: WithHttp ⇒
     }
 
     for {
-      feed ← feed(_.get(uri))
-      infos ← Future(feed \\ "entry").flatMap(go(_, Nil))
+      (_, xml) ← feed(_.get(uri))
+      infos ← Future(xml \\ "entry").flatMap(go(_, Nil))
     } yield infos
   }
 
@@ -105,27 +105,7 @@ trait Spreadsheet { http: WithHttp ⇒
    * } map (_._2)
    * }}}
    */
-  def withWorksheets[T](id: String)(z: T)(f: (T, WorksheetInfo) ⇒ Either[T, T]): Future[T] = {
-    @annotation.tailrec
-    def go(state: T, entries: Seq[Node]): Future[T] = entries.headOption match {
-      case Some(entry) ⇒ Spreadsheet.worksheetInfo(entry) match {
-        case w @ Some(info) ⇒ f(state, info) match {
-          case Right(next) ⇒ go(next, entries.tail) // required to go next
-          case Left(finval) ⇒ // final value, no need to look after
-            Future.successful(finval)
-        }
-        case _ ⇒ Future.failed[T](
-          new RuntimeException(s"Invalid worksheet entry: $entry"))
-      }
-      case _ ⇒ Future.successful[T](state)
-    }
-
-    for {
-      xml ← feed(_.get(new URI(
-        s"https://spreadsheets.google.com/feeds/worksheets/$id/private/full")))
-      info ← Future(xml \\ "entry").flatMap(go(z, _))
-    } yield info
-  }
+  def withWorksheets[T](id: String)(z: T)(f: (T, WorksheetInfo) ⇒ Either[T, T]): Future[T] = withWorksheets(id, z)(f).map(_._2)
 
   /**
    * Returns worksheet from specified worksheet
@@ -140,13 +120,8 @@ trait Spreadsheet { http: WithHttp ⇒
    *   worksheet("spreadsheetId", 0)
    * }}}
    */
-  def worksheet(id: String, index: Int): Future[Option[WorksheetInfo]] = {
-    val I = index
-    withWorksheets[(Int, Option[WorksheetInfo])](id)(0 -> None) {
-      case ((I, _), matching) ⇒ Left(0 -> Some(matching))
-      case ((i, v), _)        ⇒ Right(i + 1 -> None)
-    } map (_._2)
-  }
+  def worksheet(id: String, index: Int): Future[Option[WorksheetInfo]] =
+    getWorksheet(id, index).map(_._2)
 
   /**
    * Returns worksheet matching given ID.
@@ -155,13 +130,7 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param worksheetId Worksheet ID ([[WorksheetInfo.id]])
    * @see [[withWorksheets]]
    */
-  def worksheet(spreadsheetId: String, worksheetId: String): Future[Option[WorksheetInfo]] = {
-    val ID = worksheetId
-    withWorksheets(spreadsheetId)(None: Option[WorksheetInfo]) {
-      case (_, w @ WorksheetInfo(ID, _, _, _, _)) ⇒ Left(Some(w))
-      case (st, _)                                ⇒ Right(st)
-    }
-  }
+  def worksheet(spreadsheetId: String, worksheetId: String): Future[Option[WorksheetInfo]] = getWorksheet(accessToken, spreadsheetId, worksheetId).map(_._2)
 
   /**
    * Returns list of cells from given URI ([[WorksheetInfo.cellsUri]]).
@@ -170,10 +139,8 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param rowRange Row range
    * @param colRange Column range
    */
-  def cells(uri: URI, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[Option[WorksheetCells]] = for {
-    xml ← feed(_.get(uri, cellRangeParams(rowRange, colRange): _*))
-    cells ← Future(Spreadsheet.worksheetCells(xml))
-  } yield cells
+  def cells(uri: URI, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[Option[WorksheetCells]] =
+    getCells(accessToken, uri, rowRange, colRange).map(_._2)
 
   /**
    * Returns matching cells, if any.
@@ -188,10 +155,10 @@ trait Spreadsheet { http: WithHttp ⇒
    * }}}
    */
   def cells(id: String, index: Int, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[Option[WorksheetCells]] = for {
-    v ← worksheet(id, index)
+    (tok, v) ← getWorksheet(id, index)
     w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
       s"No matching worksheet: $id, $index")))(Future.successful)
-    cs ← cells(w.cellsUri, rowRange, colRange)
+    (_, cs) ← getCells(tok, w.cellsUri, rowRange, colRange)
   } yield cs
 
   /**
@@ -208,8 +175,8 @@ trait Spreadsheet { http: WithHttp ⇒
    */
   def cells(spreadsheetId: String, worksheetId: String, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[Option[WorksheetCells]] =
     for {
-      xml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), cellRangeParams(rowRange, colRange): _*))
-      cells ← Future(Spreadsheet.worksheetCells(xml))
+      (_, xml) ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), cellRangeParams(rowRange, colRange): _*))
+      cells ← Future(Spreadsheet worksheetCells xml)
     } yield cells
 
   /**
@@ -222,33 +189,7 @@ trait Spreadsheet { http: WithHttp ⇒
    * lastRow("spreadsheetId", "worksheetId")
    * }}}
    */
-  def lastRow(spreadsheetId: String, worksheetId: String): Future[Option[WorksheetCells]] = for {
-    cxml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/basic"), "max-results" -> "1")).
-      map(Some(_)).recover[Option[Elem]] { case _ ⇒ None }
-    batch ← {
-      cxml.fold(worksheet(spreadsheetId, worksheetId).flatMap(_.fold(
-        Future.failed[String](new IllegalArgumentException(
-          s"Worksheet not found: $worksheetId ($spreadsheetId)")))(_ ⇒
-          Future.successful(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full/batch")))) { xml ⇒
-        (xml \ "link").foldLeft[Option[String]](None) { (o, l) ⇒
-          if (l.attribute("rel").exists(
-            _.text == "http://schemas.google.com/g/2005#batch")) {
-            l.attribute("href").headOption.map(_.text)
-          } else o
-        }.fold(Future.failed[String](new IllegalArgumentException(
-          "Batch URI not found")))(Future.successful(_))
-      }
-    }
-    buri ← Future(new URI(batch))
-    last ← cxml.fold(Future successful "0") { xml ⇒
-      (xml \ "totalResults").headOption.fold(Future.failed[String](
-        new IllegalArgumentException("Expecting openSearch:totalResults")))(r ⇒
-        Future(r.text))
-    }
-    xml ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), "start-index" -> last))
-    row ← Future(Spreadsheet.cells(xml))
-    count ← Future(last.toInt)
-  } yield row.map(WorksheetCells(count, buri, _))
+  def lastRow(spreadsheetId: String, worksheetId: String): Future[Option[WorksheetCells]] = getLastRow(spreadsheetId, worksheetId).map(_._2)
 
   /**
    * Changes cells. Any existing content will be overwrited .
@@ -257,54 +198,8 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param cells List of cells to be created
    * @return List of version URI for each created cell
    */
-  def change(uri: URI, cells: List[CellValue]): Future[List[URI]] = {
-    @annotation.tailrec
-    def versionUri(links: Seq[Node]): Option[URI] = links.headOption match {
-      case Some(l) ⇒
-        if (l.attribute("rel").exists(_.text == "edit")) {
-          l.attribute("href").headOption match {
-            case Some(veru) ⇒ Some(new URI(veru.text))
-            case _          ⇒ versionUri(links.tail)
-          }
-        } else versionUri(links.tail)
-      case _ ⇒ None
-    }
-
-    Future(http.client acquireAndGet { c ⇒
-      val exec: HttpRequestBase ⇒ HttpClient ⇒ ManagedResource[HttpResponse] =
-        refreshToken.fold({ req: HttpRequestBase ⇒
-          { c: HttpClient ⇒ c.execute(OAuthClient.prepare(req, accessToken)) }
-        }) { ref ⇒
-          { req: HttpRequestBase ⇒
-            { c: HttpClient ⇒
-              c.execute(OAuthClient.refreshable(req, accessToken,
-                ref.clientId, ref.clientSecret, ref.token))
-            }
-          }
-        }
-
-      cells.foldLeft(List.empty[URI]) { (l, cell) ⇒
-        val req = c.post(uri, cellXml(uri, cell), "application/atom+xml")
-        exec(req)(c) flatMap { r ⇒
-          if (r.getStatusLine.getStatusCode != 201 /* Created */ ) {
-            sys.error(s"Fails to create cell: $cell, cause: ${r.getStatusLine}")
-            // Will be pushed into wrapping ManagedResource
-          } else managed(new InputStreamReader(r.getEntity.getContent))
-        } map { r ⇒
-          val src = new InputSource(r)
-          src.setSystemId(uri.toString)
-          XML.load(src)
-        } acquireAndGet { xml ⇒
-          versionUri(xml \\ "link") match {
-            case Some(vu) ⇒ l :+ vu
-            case _ ⇒
-              sys.error(s"Fails to extract version URI: $xml")
-            // Will be pushed into wrapping ManagedResource
-          }
-        }
-      }
-    })
-  }
+  def change(uri: URI, cells: List[CellValue]): Future[List[URI]] =
+    change(accessToken, uri, cells)
 
   /**
    * Changes cell in specified worksheet.
@@ -321,10 +216,10 @@ trait Spreadsheet { http: WithHttp ⇒
    * }}}
    */
   def change(id: String, index: Int, cells: List[CellValue]): Future[List[URI]] = for {
-    v ← worksheet(id, index)
+    (tok, v) ← getWorksheet(id, index) // TODO: getWorksheet
     w ← v.fold(Future.failed[WorksheetInfo](new IllegalArgumentException(
       s"No matching worksheet: $id, $index")))(Future.successful)
-    vs ← change(w.cellsUri, cells)
+    vs ← change(tok, w.cellsUri, cells)
   } yield vs
 
   /**
@@ -341,7 +236,7 @@ trait Spreadsheet { http: WithHttp ⇒
    * change("spreadsheetId", "worksheetId", List(CellValue(1, 2, "A")))
    * }}}
    */
-  def change(spreadsheetId: String, worksheetId: String, cells: List[CellValue]): Future[List[URI]] = change(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), cells)
+  def change(spreadsheetId: String, worksheetId: String, cells: List[CellValue]): Future[List[URI]] = change(accessToken, spreadsheetId, worksheetId, cells)
 
   /**
    * Inserts given values as cells in a new row
@@ -360,10 +255,10 @@ trait Spreadsheet { http: WithHttp ⇒
    * }}}
    */
   def append(spreadsheetId: String, worksheetId: String, values: List[(Int, String)]): Future[List[URI]] = for {
-    row ← lastRow(spreadsheetId, worksheetId)
+    (tok, row) ← getLastRow(spreadsheetId, worksheetId)
     newPos = row.fold(1)(_.cells.headOption.fold(1)(_.row + 1))
     cells = values.map(v ⇒ CellValue(newPos, v._1, v._2))
-    vs ← change(spreadsheetId, worksheetId, cells)
+    vs ← change(tok, spreadsheetId, worksheetId, cells)
   } yield vs
 
   /**
@@ -388,6 +283,178 @@ trait Spreadsheet { http: WithHttp ⇒
     }._2)
 
   // ---
+
+  /**
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param worksheetId Worksheet ID ([[WorksheetInfo.id]])
+   * @return (Access token for next call, Last row)
+   */
+  @inline private def getLastRow(spreadsheetId: String, worksheetId: String): Future[(String, Option[WorksheetCells])] = for {
+    (tok1, xml) ← feed(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/basic"), "max-results" -> "1")).
+      recoverWith[(String, Elem)] {
+        case ex ⇒ Future.failed(
+          new RuntimeException(
+            s"Cannot find worksheet: $worksheetId ($spreadsheetId)"))
+      }
+    (batch, last) ← {
+      Future(for {
+        batch ← (xml \ "link").foldLeft[Option[URI]](None) { (o, l) ⇒
+          if (l.attribute("rel").exists(
+            _.text == "http://schemas.google.com/g/2005#batch")) {
+            l.attribute("href").headOption.map(e ⇒ new URI(e.text))
+          } else o
+        }
+        last ← (xml \ "totalResults").headOption.map(_.text)
+      } yield batch -> last).flatMap(_.fold[Future[(URI, String)]](
+        Future.failed[(URI, String)](
+          new RuntimeException("Cells information not found")))(
+          Future.successful(_)))
+    }
+    (tok2, row) ← if (last == "0") {
+      Future.successful[(String, Option[WorksheetCells])](tok1 -> None)
+    } else {
+      val count = last.toInt
+      feed(tok1)(_.get(new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), "start-index" -> last)).
+        map(res ⇒ res._1 -> Spreadsheet.cells(res._2).
+          map(WorksheetCells(count, batch, _)))
+    }
+  } yield tok2 -> row
+
+  /**
+   * @param accessToken OAuth Access token
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param worksheetId Worksheet ID ([[WorksheetInfo.id]])
+   * @return (Access token for next call, worksheet information)
+   */
+  @inline private def getWorksheet(accessToken: String, spreadsheetId: String, worksheetId: String): Future[(String, Option[WorksheetInfo])] = {
+    val ID = worksheetId
+    withWorksheets(spreadsheetId, None: Option[WorksheetInfo]) {
+      case (_, w @ WorksheetInfo(ID, _, _, _, _)) ⇒ Left(Some(w))
+      case (st, _)                                ⇒ Right(st)
+    }
+  }
+
+  /**
+   * @param id Spreadsheet ID
+   * @param index Worksheet index in underlying feed
+   * @return (Access token for next call, worksheet information)
+   */
+  @inline private def getWorksheet(id: String, index: Int): Future[(String, Option[WorksheetInfo])] = {
+    val I = index
+    withWorksheets[(Int, Option[WorksheetInfo])](id, 0 -> None) {
+      case ((I, _), matching) ⇒ Left(0 -> Some(matching))
+      case ((i, v), _)        ⇒ Right(i + 1 -> None)
+    } map { res ⇒ res._1 -> res._2._2 }
+  }
+
+  /**
+   * @param accessToken OAuth access token
+   * @param uri Cells URI
+   * @param rowRange Row range
+   * @param colRange Column range
+   * @return (Access token for next call, current result)
+   */
+  @inline private def getCells(accessToken: String, uri: URI, rowRange: Option[WorksheetRange], colRange: Option[WorksheetRange]): Future[(String, Option[WorksheetCells])] =
+    for {
+      (tok, xml) ← feed(accessToken)(
+        _.get(uri, cellRangeParams(rowRange, colRange): _*))
+      cells ← Future(Spreadsheet worksheetCells xml)
+    } yield tok -> cells
+
+  /**
+   * @param accessToken OAuth access token
+   * @param uri Cells URI ([[WorksheetInfo.cellsUri]])
+   * @param cells List of cells to be created
+   * @return List of version URI for each created cell
+   */
+  @inline private def change(accessToken: String, uri: URI, cells: List[CellValue]): Future[List[URI]] = {
+    @annotation.tailrec
+    def versionUri(links: Seq[Node]): Option[URI] = links.headOption match {
+      case Some(l) ⇒
+        if (l.attribute("rel").exists(_.text == "edit")) {
+          l.attribute("href").headOption match {
+            case Some(veru) ⇒ Some(new URI(veru.text))
+            case _          ⇒ versionUri(links.tail)
+          }
+        } else versionUri(links.tail)
+      case _ ⇒ None
+    }
+
+    Future(http.client acquireAndGet { c ⇒
+      val exec: HttpRequestBase ⇒ HttpClient ⇒ ManagedResource[(String, HttpResponse)] = refreshToken.fold({ req: HttpRequestBase ⇒
+        { c: HttpClient ⇒
+          c.execute(OAuthClient.prepare(req, accessToken)).map(resp ⇒
+            accessToken -> resp): ManagedResource[(String, HttpResponse)]
+        }
+      }) { ref ⇒
+        { req: HttpRequestBase ⇒
+          { c: HttpClient ⇒
+            c.execute(OAuthClient.refreshable(req, accessToken,
+              ref.clientId, ref.clientSecret, ref.token))
+          }
+        }
+      }
+
+      cells.foldLeft(List.empty[URI]) { (l, cell) ⇒
+        val req = c.post(uri, cellXml(uri, cell), "application/atom+xml")
+        exec(req)(c) flatMap { r ⇒
+          if (r._2.getStatusLine.getStatusCode != 201 /* Created */ ) {
+            sys.error(
+              s"Fails to create cell: $cell, cause: ${r._2.getStatusLine}")
+            // Will be pushed into wrapping ManagedResource
+          } else managed(new InputStreamReader(r._2.getEntity.getContent))
+        } map { r ⇒
+          val src = new InputSource(r)
+          src.setSystemId(uri.toString)
+          XML.load(src)
+        } acquireAndGet { xml ⇒
+          versionUri(xml \\ "link") match {
+            case Some(vu) ⇒ l :+ vu
+            case _ ⇒
+              sys.error(s"Fails to extract version URI: $xml")
+            // Will be pushed into wrapping ManagedResource
+          }
+        }
+      }
+    })
+  }
+
+  /**
+   * @param accessToken OAuth access token
+   * @param spreadsheetId Spreadsheet ID
+   * @param worksheetId Worksheet ID
+   * @param cells List of cells to be created
+   * @return List of version URIs for each created cell
+   */
+  @inline private def change(accessToken: String, spreadsheetId: String, worksheetId: String, cells: List[CellValue]): Future[List[URI]] = change(accessToken, new URI(s"https://spreadsheets.google.com/feeds/cells/$spreadsheetId/$worksheetId/private/full"), cells)
+
+  /**
+   * @param id Spreadsheet ID
+   * @param z Initial value for function `f`
+   * @param f Function given current state and extracted information. Must return either a final value at `Left` if must not look at other worksheets, or updated value at `Right` to go on processing worksheets.
+   * @return (Access token for next call, current result)
+   */
+  private def withWorksheets[T](id: String, z: T)(f: (T, WorksheetInfo) ⇒ Either[T, T]): Future[(String, T)] = {
+    @annotation.tailrec
+    def go(state: T, entries: Seq[Node]): Future[T] = entries.headOption match {
+      case Some(entry) ⇒ Spreadsheet.worksheetInfo(entry) match {
+        case w @ Some(info) ⇒ f(state, info) match {
+          case Right(next) ⇒ go(next, entries.tail) // required to go next
+          case Left(finval) ⇒ // final value, no need to look after
+            Future.successful(finval)
+        }
+        case _ ⇒ Future.failed[T](
+          new RuntimeException(s"Invalid worksheet entry: $entry"))
+      }
+      case _ ⇒ Future.successful[T](state)
+    }
+
+    for {
+      (tok, xml) ← feed(_.get(new URI(
+        s"https://spreadsheets.google.com/feeds/worksheets/$id/private/full")))
+      info ← Future(xml \\ "entry").flatMap(go(z, _))
+    } yield tok -> info
+  }
 
   /**
    * @param uri Cells URI
@@ -418,16 +485,20 @@ trait Spreadsheet { http: WithHttp ⇒
     case _ ⇒ Nil
   }
 
-  private def feed(r: (HttpClient) ⇒ HttpRequestBase): Future[Elem] =
+  @inline private def feed(r: (HttpClient) ⇒ HttpRequestBase): Future[(String, Elem)] = feed(this.accessToken)(r)
+
+  private def feed(accessToken: String)(r: (HttpClient) ⇒ HttpRequestBase): Future[(String, Elem)] =
     Future {
       (for {
         client ← http.client
         val req = r(client)
-        resp ← refreshToken.fold(
-          client.execute(OAuthClient.prepare(req, accessToken)))(ref ⇒
+        res ← refreshToken.fold[ManagedResource[(String, HttpResponse)]](
+          client.execute(OAuthClient.prepare(req, accessToken)).map(x ⇒
+            accessToken -> x))(ref ⇒
             client.execute(OAuthClient.refreshable(req, accessToken,
               ref.clientId, ref.clientSecret, ref.token)))
         val uri = req.getURI.toString
+        val resp = res._2
         src ← if (resp.getStatusLine.getStatusCode == 200) {
           managed(new InputStreamReader(resp.getEntity.getContent)) map { r ⇒
             val src = new InputSource(r)
@@ -435,7 +506,10 @@ trait Spreadsheet { http: WithHttp ⇒
             src
           }
         } else sys.error(s"Fails to get feed: ${resp.getStatusLine} ($uri)")
-      } yield src).acquireAndGet(XML.load)
+      } yield res._1 -> src) acquireAndGet { d ⇒
+        val (tok, src) = d
+        tok -> XML.load(src)
+      }
     }
 }
 

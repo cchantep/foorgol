@@ -203,8 +203,10 @@ object SpreadsheetSpec
           reqUri aka "request URI" must_== ("https://spreadsheets.google.com/feeds/cells/_spreadsheetId4/_worksheetId1/private/full?min-col=1&max-col=2") and (res aka "cells" must_== cells3)
         }.await
     }
+  }
 
-    "be found for last row of specified worksheet" in {
+  "Last row" should {
+    "be found for specified worksheet with existing cells" in {
       val reqs = scala.collection.mutable.MutableList.empty[String]
       val mock = MockSpreadsheet("accessToken17", None) {
         MockHttpClient { req ⇒ reqs += req.getURI.toString; resp5 }
@@ -214,6 +216,37 @@ object SpreadsheetSpec
         aka("response") must beSome[WorksheetCells].which { res ⇒
           reqs.toList aka "request URIs" must_== List("https://spreadsheets.google.com/feeds/cells/_spreadsheetId5/_worksheetId2/private/basic?max-results=1", "https://spreadsheets.google.com/feeds/cells/_spreadsheetId5/_worksheetId2/private/full?start-index=5") and (res aka "cells" must_== cells3)
         }.await
+    }
+
+    "not be found for specified worksheet with no cell" in {
+      val resp = resp11
+      val reqs = scala.collection.mutable.MutableList.empty[String]
+      val mock = MockSpreadsheet("accessToken18", None) {
+        MockHttpClient { req ⇒ reqs += req.getURI.toString; resp.next }
+      }
+
+      mock.lastRow("_spreadsheetId6", "_worksheetId2").
+        aka("response") must beLike[Option[WorksheetCells]] {
+          case res ⇒
+            reqs.toList aka "request URIs" must_== List("https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId2/private/basic?max-results=1") and (res aka "last row" must beNone)
+        }.await
+    }
+
+    "fail to be checked when worksheet is not found" in {
+      val resp = resp12
+      val reqs = scala.collection.mutable.MutableList.empty[String]
+      val mock = MockSpreadsheet("accessToken18", None) {
+        MockHttpClient { req ⇒ reqs += req.getURI.toString; resp.next }
+      }
+
+      scala.concurrent.Await.result(
+        mock.lastRow("_spreadsheetId7", "_worksheetId2"),
+        Duration(2, "s")) aka "result" must throwA[Exception].like {
+          case ex ⇒
+            ex.getMessage aka "error" must_== (
+              "Cannot find worksheet: _worksheetId2 (_spreadsheetId7)") and (
+                reqs.toList aka "request URIs" must_== List("https://spreadsheets.google.com/feeds/cells/_spreadsheetId7/_worksheetId2/private/basic?max-results=1"))
+        }
     }
   }
 
@@ -592,4 +625,26 @@ sealed trait SpreadsheetFixtures {
   }
 
   val body10 = """<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R4C1</id><link rel="edit" type="application/atom+xml" href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId3/private/full/R4C1"/><gs:cell row="4" col="1" inputValue="appended"/></entry>"""
+
+  def resp11 = {
+    val ent1 = new StringEntity("""<feed xmlns:batch="http://schemas.google.com/gdata/batch" xmlns:gs="http://schemas.google.com/spreadsheets/2006" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns="http://www.w3.org/2005/Atom"><id>https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId2/private/full</id><updated>2014-08-28T18:32:54.266Z</updated><category term="http://schemas.google.com/spreadsheets/2006#cell" scheme="http://schemas.google.com/spreadsheets/2006"/><title type="text">1.Sheet</title><link href="https://docs.google.com/spreadsheets/d/_spreadsheetId6/edit" type="application/atom+xml" rel="alternate"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId2/private/full" type="application/atom+xml" rel="http://schemas.google.com/g/2005#feed"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId2/private/full" type="application/atom+xml" rel="http://schemas.google.com/g/2005#post"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId2/private/full/batch" type="application/atom+xml" rel="http://schemas.google.com/g/2005#batch"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId2/private/full" type="application/atom+xml" rel="self"/><author><name>google</name><email>google@applicius.fr</email></author><openSearch:totalResults>0</openSearch:totalResults><openSearch:startIndex>1</openSearch:startIndex><gs:rowCount>1000</gs:rowCount><gs:colCount>26</gs:colCount></feed>""")
+    val respA = new BasicHttpResponse(new BasicStatusLine(httpProto, 200, "OK"))
+    respA.setEntity(ent1)
+
+    val ent2 = new StringEntity("""<feed xmlns:gs="http://schemas.google.com/spreadsheets/2006" xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/" xmlns="http://www.w3.org/2005/Atom"><id>https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId6/private/full</id><updated>2014-08-28T18:32:54.266Z</updated><category term="http://schemas.google.com/spreadsheets/2006#worksheet" scheme="http://schemas.google.com/spreadsheets/2006"/><title type="text">2.Sheet</title><link href="https://docs.google.com/spreadsheets/d/_spreadsheetId6/edit" type="application/atom+xml" rel="alternate"/><link href="https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId6/private/full" type="application/atom+xml" rel="http://schemas.google.com/g/2005#feed"/><link href="https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId6/private/full" type="application/atom+xml" rel="http://schemas.google.com/g/2005#post"/><link href="https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId6/private/full" type="application/atom+xml" rel="self"/><author><name>google</name><email>google@applicius.fr</email></author><openSearch:totalResults>1</openSearch:totalResults><openSearch:startIndex>1</openSearch:startIndex><entry><id>https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId6/private/full/_worksheetId2</id><updated>2014-08-28T18:32:54.266Z</updated><category term="http://schemas.google.com/spreadsheets/2006#worksheet" scheme="http://schemas.google.com/spreadsheets/2006"/><title type="text">Worksheet 1</title><content type="text">Worksheet 1</content><link href="https://spreadsheets.google.com/feeds/list/_spreadsheetId6/_worksheetId2/private/full" type="application/atom+xml" rel="http://schemas.google.com/spreadsheets/2006#listfeed"/><link href="https://spreadsheets.google.com/feeds/cells/_spreadsheetId6/_worksheetId2/private/full" type="application/atom+xml" rel="http://schemas.google.com/spreadsheets/2006#cellsfeed"/><link href="https://docs.google.com/spreadsheets/d/_spreadsheetId6/gviz/tq?gid=0" type="application/atom+xml" rel="http://schemas.google.com/visualization/2008#visualizationApi"/><link href="https://docs.google.com/spreadsheets/d/_spreadsheetId6/export?gid=0&amp;format=csv" type="text/csv" rel="http://schemas.google.com/spreadsheets/2006#exportcsv"/><link href="https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId6/private/full/_worksheetId2" type="application/atom+xml" rel="self"/><link href="https://spreadsheets.google.com/feeds/worksheets/_spreadsheetId6/private/full/_worksheetId2/u9oqmj" type="application/atom+xml" rel="edit"/><gs:colCount>26</gs:colCount><gs:rowCount>1000</gs:rowCount></entry></feed>""")
+    val respB = new BasicHttpResponse(new BasicStatusLine(httpProto, 200, "OK"))
+    respB.setEntity(ent2)
+
+    List(respA, respB).iterator
+  }
+
+  def resp12 = {
+    val respA = new BasicHttpResponse(
+      new BasicStatusLine(httpProto, 400, "Bad Request"))
+
+    val respB = new BasicHttpResponse(
+      new BasicStatusLine(httpProto, 404, "Not Found"))
+
+    List(respA, respB).iterator
+  }
 }

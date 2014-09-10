@@ -18,7 +18,7 @@ trait HttpClient extends java.io.Closeable {
   def execute[R <: HttpRequestBase](request: R): ManagedResource[HttpResponse]
 
   /** Executes refreshable request and returns response. */
-  def execute[R <: HttpRequestBase](request: OAuthClient.Refreshable[R]): ManagedResource[HttpResponse]
+  def execute[R <: HttpRequestBase](request: OAuthClient.Refreshable[R]): ManagedResource[(String, HttpResponse)]
 
   /** Executes a GET request and returns its response. */
   def get(uri: URI, parameters: (String, String)*) =
@@ -40,6 +40,16 @@ trait HttpClient extends java.io.Closeable {
 
 /** Client companion. */
 object HttpClient {
+  import org.apache.commons.lang3.tuple.ImmutablePair
+  import org.apache.http.client.methods.CloseableHttpResponse
+
+  type RefreshedResponse = ImmutablePair[String, CloseableHttpResponse]
+  implicit object RefreshedResponseResponse
+      extends resource.Resource[RefreshedResponse] {
+
+    def close(resp: RefreshedResponse) = resp.right.close()
+  }
+
   /** Returns new client using default implementation. */
   def apply(): HttpClient = new Default()
 
@@ -50,7 +60,8 @@ object HttpClient {
 
     def execute[R <: HttpRequestBase](request: R): ManagedResource[HttpResponse] = managed(underlying execute request)
 
-    def execute[R <: HttpRequestBase](request: OAuthClient.Refreshable[R]): ManagedResource[HttpResponse] = managed(request executeWith underlying)
+    def execute[R <: HttpRequestBase](request: OAuthClient.Refreshable[R]): ManagedResource[(String, HttpResponse)] = managed(request executeWith underlying).
+      map(p ⇒ p.left -> p.right)
 
     def close(): Unit = underlying.close()
   }

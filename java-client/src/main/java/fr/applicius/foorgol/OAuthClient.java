@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
+import org.apache.commons.lang3.tuple.ImmutablePair;
+
 import org.apache.http.HttpResponse;
 
 import org.apache.http.message.BasicNameValuePair;
@@ -35,7 +37,7 @@ public class OAuthClient {
     /**
      * Logger
      */
-    private static final Logger logger = Logger.getLogger("foorgol-java");
+    private static final Logger logger = Logger.getLogger("foorgol-oauth");
 
     // ---
     
@@ -222,7 +224,7 @@ public class OAuthClient {
          * access token.
          * (Given client is not closed)
          */
-        public CloseableHttpResponse executeWith(final CloseableHttpClient client) {
+        public ImmutablePair<String, CloseableHttpResponse> executeWith(final CloseableHttpClient client) {
             CloseableHttpResponse resp = null;
 
             try {
@@ -233,8 +235,8 @@ public class OAuthClient {
 
                 logger.log(Level.FINER, "Initial status code: {0}", statusCode);
 
-                if (statusCode == 200) {
-                    return resp;
+                if (statusCode >= 200 && statusCode < 300) {
+                    return ImmutablePair.of(this.accessToken, resp);
                 } else if (statusCode == 401) {
                     logger.warning("Will try to execute with refreshed token");
 
@@ -248,7 +250,9 @@ public class OAuthClient {
 
                     logger.log(Level.FINE, "Refresh access token: {0}", tok);
                     
-                    return client.execute(prepare(underlying, tok));
+                    return ImmutablePair.
+                        of(tok, client.execute(prepare(underlying, tok)));
+
                 } // end of else if
 
                 // ---
