@@ -198,6 +198,48 @@
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>AnyRef → Any</dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#append" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="append(spreadsheetId:String,worksheetId:String,values:String*):scala.concurrent.Future[List[java.net.URI]]"></a>
+      <a id="append(String,String,String*):Future[List[URI]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">append</span><span class="params">(<span name="spreadsheetId">spreadsheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="worksheetId">worksheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="values">values: <span class="extype" name="scala.Predef.String">String</span>*</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.List">List</span>[<span class="extype" name="java.net.URI">URI</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@append(spreadsheetId:String,worksheetId:String,values:String*):scala.concurrent.Future[List[java.net.URI]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Inserts given values as uninterrupted sequence of cells in a new row
+at end of the specified worksheet.</p><div class="fullcomment"><div class="comment cmt"><p>Inserts given values as uninterrupted sequence of cells in a new row
+at end of the specified worksheet.
+</p></div><dl class="paramcmts block"><dt class="param">spreadsheetId</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">worksheetId</dt><dd class="cmt"><p>Worksheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">values</dt><dd class="cmt"><p>Uninterrupted sequence of cell values</p></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#append" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="append(spreadsheetId:String,worksheetId:String,values:List[(Int,String)]):scala.concurrent.Future[List[java.net.URI]]"></a>
+      <a id="append(String,String,List[(Int,String)]):Future[List[URI]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">append</span><span class="params">(<span name="spreadsheetId">spreadsheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="worksheetId">worksheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="values">values: <span class="extype" name="scala.List">List</span>[(<span class="extype" name="scala.Int">Int</span>, <span class="extype" name="scala.Predef.String">String</span>)]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.List">List</span>[<span class="extype" name="java.net.URI">URI</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@append(spreadsheetId:String,worksheetId:String,values:List[(Int,String)]):scala.concurrent.Future[List[java.net.URI]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Inserts given values as cells in a new row
+at end of the specified worksheet
+(after the last row containing a cell with some content).</p><div class="fullcomment"><div class="comment cmt"><p>Inserts given values as cells in a new row
+at end of the specified worksheet
+(after the last row containing a cell with some content).
+</p></div><dl class="paramcmts block"><dt class="param">spreadsheetId</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">worksheetId</dt><dd class="cmt"><p>Worksheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">values</dt><dd class="cmt"><p>Cell values with associated positions (first = 1)</p></dd></dl></div>
     </li><li name="scala.Any#asInstanceOf" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="asInstanceOf[T0]:T0"></a>
       <a id="asInstanceOf[T0]:T0"></a>
@@ -216,42 +258,80 @@
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
     </li><li name="fr.applicius.foorgol.Spreadsheet#cells" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="cells(id:String,index:Int,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[fr.applicius.foorgol.WorksheetCells]"></a>
-      <a id="cells(String,Int,Option[WorksheetRange],Option[WorksheetRange]):Future[WorksheetCells]"></a>
+      <a id="cells(spreadsheetId:String,worksheetId:String,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetCells]]"></a>
+      <a id="cells(String,String,Option[WorksheetRange],Option[WorksheetRange]):Future[Option[WorksheetCells]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">cells</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="index">index: <span class="extype" name="scala.Int">Int</span></span>, <span name="rowRange">rowRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>] = <span class="symbol">None</span></span>, <span name="colRange">colRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>] = <span class="symbol">None</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="WorksheetCells.html" class="extype" name="fr.applicius.foorgol.WorksheetCells">WorksheetCells</a>]</span>
+        <span class="name">cells</span><span class="params">(<span name="spreadsheetId">spreadsheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="worksheetId">worksheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="rowRange">rowRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>, <span name="colRange">colRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<a href="WorksheetCells.html" class="extype" name="fr.applicius.foorgol.WorksheetCells">WorksheetCells</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@cells(id:String,index:Int,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[fr.applicius.foorgol.WorksheetCells]" title="Permalink" target="_top">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@cells(spreadsheetId:String,worksheetId:String,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetCells]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" />
       </a>
     </span>
       <p class="shortcomment cmt">Returns matching cells, if any.</p><div class="fullcomment"><div class="comment cmt"><p>Returns matching cells, if any.
-</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index (first = 0)</p></dd><dt class="param">rowRange</dt><dd class="cmt"><p>Optional row range</p></dd><dt class="param">colRange</dt><dd class="cmt"><p>Optional column range</p><pre>cells(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>) <span class="cmt">// all cells of first worksheet</span></pre></dd></dl></div>
+</p></div><dl class="paramcmts block"><dt class="param">spreadsheetId</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">worksheetId</dt><dd class="cmt"><p>Worksheet ID (<a href="WorksheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#id">WorksheetInfo.id</a>)</p></dd><dt class="param">rowRange</dt><dd class="cmt"><p>Optional row range</p></dd><dt class="param">colRange</dt><dd class="cmt"><p>Optional column range</p><pre>cells(<span class="lit">"spreadsheetId"</span>, <span class="lit">"worksheetId"</span>, <span class="std">None</span>, <span class="std">None</span>)</pre></dd></dl></div>
     </li><li name="fr.applicius.foorgol.Spreadsheet#cells" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
-      <a id="cells(uri:java.net.URI,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[fr.applicius.foorgol.WorksheetCells]"></a>
-      <a id="cells(URI,Option[WorksheetRange],Option[WorksheetRange]):Future[WorksheetCells]"></a>
+      <a id="cells(id:String,index:Int,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetCells]]"></a>
+      <a id="cells(String,Int,Option[WorksheetRange],Option[WorksheetRange]):Future[Option[WorksheetCells]]"></a>
       <h4 class="signature">
       <span class="modifier_kind">
         <span class="modifier"></span>
         <span class="kind">def</span>
       </span>
       <span class="symbol">
-        <span class="name">cells</span><span class="params">(<span name="uri">uri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="rowRange">rowRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>, <span name="colRange">colRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<a href="WorksheetCells.html" class="extype" name="fr.applicius.foorgol.WorksheetCells">WorksheetCells</a>]</span>
+        <span class="name">cells</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="index">index: <span class="extype" name="scala.Int">Int</span></span>, <span name="rowRange">rowRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>, <span name="colRange">colRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<a href="WorksheetCells.html" class="extype" name="fr.applicius.foorgol.WorksheetCells">WorksheetCells</a>]]</span>
       </span>
       </h4><span class="permalink">
-      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@cells(uri:java.net.URI,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[fr.applicius.foorgol.WorksheetCells]" title="Permalink" target="_top">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@cells(id:String,index:Int,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetCells]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns matching cells, if any.</p><div class="fullcomment"><div class="comment cmt"><p>Returns matching cells, if any.
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index (first = 0)</p></dd><dt class="param">rowRange</dt><dd class="cmt"><p>Optional row range</p></dd><dt class="param">colRange</dt><dd class="cmt"><p>Optional column range</p><pre>cells(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>, <span class="std">None</span>, <span class="std">None</span>) <span class="cmt">// all cells of first worksheet</span></pre></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#cells" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="cells(uri:java.net.URI,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetCells]]"></a>
+      <a id="cells(URI,Option[WorksheetRange],Option[WorksheetRange]):Future[Option[WorksheetCells]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">cells</span><span class="params">(<span name="uri">uri: <span class="extype" name="java.net.URI">URI</span></span>, <span name="rowRange">rowRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>, <span name="colRange">colRange: <span class="extype" name="scala.Option">Option</span>[<a href="WorksheetRange.html" class="extype" name="fr.applicius.foorgol.WorksheetRange">WorksheetRange</a>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<a href="WorksheetCells.html" class="extype" name="fr.applicius.foorgol.WorksheetCells">WorksheetCells</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@cells(uri:java.net.URI,rowRange:Option[fr.applicius.foorgol.WorksheetRange],colRange:Option[fr.applicius.foorgol.WorksheetRange]):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetCells]]" title="Permalink" target="_top">
         <img src="../../../lib/permalink.png" />
       </a>
     </span>
       <p class="shortcomment cmt">Returns list of cells from given URI (<a href="WorksheetInfo.html#cellsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#cellsUri">WorksheetInfo.cellsUri</a>).</p><div class="fullcomment"><div class="comment cmt"><p>Returns list of cells from given URI (<a href="WorksheetInfo.html#cellsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#cellsUri">WorksheetInfo.cellsUri</a>).
 </p></div><dl class="paramcmts block"><dt class="param">uri</dt><dd class="cmt"><p>Cells URI</p></dd><dt class="param">rowRange</dt><dd class="cmt"><p>Row range</p></dd><dt class="param">colRange</dt><dd class="cmt"><p>Column range
 </p></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#change" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="change(spreadsheetId:String,worksheetId:String,cells:List[fr.applicius.foorgol.CellValue]):scala.concurrent.Future[List[java.net.URI]]"></a>
+      <a id="change(String,String,List[CellValue]):Future[List[URI]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">change</span><span class="params">(<span name="spreadsheetId">spreadsheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="worksheetId">worksheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="cells">cells: <span class="extype" name="scala.List">List</span>[<a href="CellValue.html" class="extype" name="fr.applicius.foorgol.CellValue">CellValue</a>]</span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.List">List</span>[<span class="extype" name="java.net.URI">URI</span>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@change(spreadsheetId:String,worksheetId:String,cells:List[fr.applicius.foorgol.CellValue]):scala.concurrent.Future[List[java.net.URI]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Changes cell in specified worksheet.</p><div class="fullcomment"><div class="comment cmt"><p>Changes cell in specified worksheet.
+</p></div><dl class="paramcmts block"><dt class="param">spreadsheetId</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">worksheetId</dt><dd class="cmt"><p>Worksheet ID (<a href="WorksheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#id">WorksheetInfo.id</a>)</p></dd><dt class="param">cells</dt><dd class="cmt"><p>List of cells to be created</p></dd><dt>returns</dt><dd class="cmt"><p>List of version URIs for each created cell</p><pre><span class="cmt">// Put "A" as content of cell at first row second column,</span>
+<span class="cmt">// first worksheet of specified spreadsheet</span>
+change(<span class="lit">"spreadsheetId"</span>, <span class="lit">"worksheetId"</span>, <span class="std">List</span>(CellValue(<span class="num">1</span>, <span class="num">2</span>, <span class="lit">"A"</span>)))</pre></dd></dl></div>
     </li><li name="fr.applicius.foorgol.Spreadsheet#change" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="change(id:String,index:Int,cells:List[fr.applicius.foorgol.CellValue]):scala.concurrent.Future[List[java.net.URI]]"></a>
       <a id="change(String,Int,List[CellValue]):Future[List[URI]]"></a>
@@ -269,9 +349,9 @@
       </a>
     </span>
       <p class="shortcomment cmt">Changes cell in specified worksheet.</p><div class="fullcomment"><div class="comment cmt"><p>Changes cell in specified worksheet.
-</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index (first = 0)</p></dd><dt class="param">cells</dt><dd class="cmt"><p>List of cells to be created</p></dd><dt>returns</dt><dd class="cmt"><p>List of version URI for each created cell</p><pre><span class="cmt">// Put "A" as content of cell at first row second column,</span>
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index (first = 0)</p></dd><dt class="param">cells</dt><dd class="cmt"><p>List of cells to be created</p></dd><dt>returns</dt><dd class="cmt"><p>List of version URIs for each created cell</p><pre><span class="cmt">// Put "A" as content of cell at first row second column,</span>
 <span class="cmt">// first worksheet of specified spreadsheet</span>
-change(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>, <span class="std">List</span>(CellValue(<span class="num">0</span>, <span class="num">1</span>, <span class="lit">"A"</span>)))</pre></dd></dl></div>
+change(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>, <span class="std">List</span>(CellValue(<span class="num">1</span>, <span class="num">2</span>, <span class="lit">"A"</span>)))</pre></dd></dl></div>
     </li><li name="fr.applicius.foorgol.Spreadsheet#change" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="change(uri:java.net.URI,cells:List[fr.applicius.foorgol.CellValue]):scala.concurrent.Future[List[java.net.URI]]"></a>
       <a id="change(URI,List[CellValue]):Future[List[URI]]"></a>
@@ -422,6 +502,24 @@ change(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>, <sp
       </a>
     </span>
       <div class="fullcomment"><dl class="attributes block"> <dt>Definition Classes</dt><dd>Any</dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#lastRow" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="lastRow(spreadsheetId:String,worksheetId:String):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetCells]]"></a>
+      <a id="lastRow(String,String):Future[Option[WorksheetCells]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">lastRow</span><span class="params">(<span name="spreadsheetId">spreadsheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="worksheetId">worksheetId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<a href="WorksheetCells.html" class="extype" name="fr.applicius.foorgol.WorksheetCells">WorksheetCells</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@lastRow(spreadsheetId:String,worksheetId:String):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetCells]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns last row of specified worksheet, if any.</p><div class="fullcomment"><div class="comment cmt"><p>Returns last row of specified worksheet, if any.
+</p></div><dl class="paramcmts block"><dt class="param">spreadsheetId</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">worksheetId</dt><dd class="cmt"><p>Worksheet ID (<a href="WorksheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#id">WorksheetInfo.id</a>)</p><pre>lastRow(<span class="lit">"spreadsheetId"</span>, <span class="lit">"worksheetId"</span>)</pre></dd></dl></div>
     </li><li name="fr.applicius.foorgol.Spreadsheet#list" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="list:scala.concurrent.Future[List[fr.applicius.foorgol.SpreadsheetInfo]]"></a>
       <a id="list:Future[List[SpreadsheetInfo]]"></a>
@@ -641,6 +739,25 @@ change(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>, <sp
   <span class="kw">else</span> Right(i+<span class="num">1</span> -&gt; <span class="std">None</span>)
 } map (_._2)</pre></dd></dl></div>
     </li><li name="fr.applicius.foorgol.Spreadsheet#worksheet" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="worksheet(spreadsheetId:String,worksheetId:String):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetInfo]]"></a>
+      <a id="worksheet(String,String):Future[Option[WorksheetInfo]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">worksheet</span><span class="params">(<span name="spreadsheetId">spreadsheetId: <span class="extype" name="scala.Predef.String">String</span></span>, <span name="worksheetId">worksheetId: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.Option">Option</span>[<a href="WorksheetInfo.html" class="extype" name="fr.applicius.foorgol.WorksheetInfo">WorksheetInfo</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@worksheet(spreadsheetId:String,worksheetId:String):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetInfo]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns worksheet matching given ID.</p><div class="fullcomment"><div class="comment cmt"><p>Returns worksheet matching given ID.
+</p></div><dl class="paramcmts block"><dt class="param">spreadsheetId</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">worksheetId</dt><dd class="cmt"><p>Worksheet ID (<a href="WorksheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.WorksheetInfo#id">WorksheetInfo.id</a>)</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="#withWorksheets[T](id:String)(z:T)(f:(T,fr.applicius.foorgol.WorksheetInfo)=&gt;Either[T,T]):scala.concurrent.Future[T]" class="extmbr" name="fr.applicius.foorgol.Spreadsheet#withWorksheets">withWorksheets</a>
+</p></span></dd></dl></div>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#worksheet" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
       <a id="worksheet(id:String,index:Int):scala.concurrent.Future[Option[fr.applicius.foorgol.WorksheetInfo]]"></a>
       <a id="worksheet(String,Int):Future[Option[WorksheetInfo]]"></a>
       <h4 class="signature">
@@ -659,7 +776,7 @@ change(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>, <sp
       <p class="shortcomment cmt">Returns worksheet from specified worksheet
 whose index in feed is given one, if any.</p><div class="fullcomment"><div class="comment cmt"><p>Returns worksheet from specified worksheet
 whose index in feed is given one, if any.
-</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index in underlying feed (first = 0)</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="#withWorksheets[T](id:String)(z:T)(f:(T,fr.applicius.foorgol.WorksheetInfo)=&gt;Either[T,T]):scala.concurrent.Future[T]" class="extmbr" name="fr.applicius.foorgol.Spreadsheet#withWorksheets">withWorksheets</a></p><pre><span class="kw">val</span> first: Future[<span class="std">Option</span>[WorksheetInfo]] =
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)</p></dd><dt class="param">index</dt><dd class="cmt"><p>Worksheet index in underlying feed (first = 0)</p></dd></dl><dl class="attributes block"> <dt>See also</dt><dd><span class="cmt"><p><a href="#withWorksheets[T](id:String)(z:T)(f:(T,fr.applicius.foorgol.WorksheetInfo)=&gt;Either[T,T]):scala.concurrent.Future[T]" class="extmbr" name="fr.applicius.foorgol.Spreadsheet#withWorksheets">withWorksheets</a></p><pre><span class="kw">val</span> first: Future[<span class="std">Option</span>[WorksheetInfo]] =
 worksheet(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>)</pre></span></dd></dl></div>
     </li><li name="fr.applicius.foorgol.Spreadsheet#worksheets" visbl="pub" data-isabs="false" fullComment="no" group="Ungrouped">
       <a id="worksheets(uri:java.net.URI):scala.concurrent.Future[List[fr.applicius.foorgol.WorksheetInfo]]"></a>
@@ -679,6 +796,26 @@ worksheet(<span class="lit">"spreadsheetId"</span>, <span class="num">0</span>)<
     </span>
       <p class="shortcomment cmt">Returns list of worksheets from given URI
 (<a href="SpreadsheetInfo.html#worksheetsUri:java.net.URI" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#worksheetsUri">SpreadsheetInfo.worksheetsUri</a>).</p>
+    </li><li name="fr.applicius.foorgol.Spreadsheet#worksheets" visbl="pub" data-isabs="false" fullComment="yes" group="Ungrouped">
+      <a id="worksheets(id:String):scala.concurrent.Future[List[fr.applicius.foorgol.WorksheetInfo]]"></a>
+      <a id="worksheets(String):Future[List[WorksheetInfo]]"></a>
+      <h4 class="signature">
+      <span class="modifier_kind">
+        <span class="modifier"></span>
+        <span class="kind">def</span>
+      </span>
+      <span class="symbol">
+        <span class="name">worksheets</span><span class="params">(<span name="id">id: <span class="extype" name="scala.Predef.String">String</span></span>)</span><span class="result">: <span class="extype" name="scala.concurrent.Future">Future</span>[<span class="extype" name="scala.List">List</span>[<a href="WorksheetInfo.html" class="extype" name="fr.applicius.foorgol.WorksheetInfo">WorksheetInfo</a>]]</span>
+      </span>
+      </h4><span class="permalink">
+      <a href="../../../index.html#fr.applicius.foorgol.Spreadsheet@worksheets(id:String):scala.concurrent.Future[List[fr.applicius.foorgol.WorksheetInfo]]" title="Permalink" target="_top">
+        <img src="../../../lib/permalink.png" />
+      </a>
+    </span>
+      <p class="shortcomment cmt">Returns list of worksheets for specified spreadsheet
+</p><div class="fullcomment"><div class="comment cmt"><p>Returns list of worksheets for specified spreadsheet
+</p></div><dl class="paramcmts block"><dt class="param">id</dt><dd class="cmt"><p>Spreadsheet ID (<a href="SpreadsheetInfo.html#id:String" class="extmbr" name="fr.applicius.foorgol.SpreadsheetInfo#id">SpreadsheetInfo.id</a>)
+</p></dd></dl></div>
     </li></ol>
             </div>
 
