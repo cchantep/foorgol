@@ -12,7 +12,7 @@ Foorgol help integration of some of these features.
 
 ## Usage
 
-Foorgool can be used in SBT projects adding dependency `"fr.applicius.foorgol" % "java-client" % "1.0.4-SNAPSHOT"` or `"fr.applicius.foorgol" %% "scala" % "1.0.4-SNAPSHOT"` and having `"Applicius Snapshots" at "https://raw.github.com/applicius/mvn-repo/master/snapshots/"` in resolvers.
+Foorgool can be used in SBT projects adding dependency `"fr.applicius.foorgol" % "java-client" % "1.0.5-SNAPSHOT"` or `"fr.applicius.foorgol" %% "scala" % "1.0.5-SNAPSHOT"` and having `"Applicius Snapshots" at "https://raw.github.com/applicius/mvn-repo/master/snapshots/"` in resolvers.
 
 * Low-level [Java API](http://applicius.github.io/foorgol/java-client/api/)
 * [Scala API](http://applicius.github.io/foorgol/scala/api/#package)
@@ -55,6 +55,16 @@ import fr.applicius.foorgol.SpreadsheetInfo
 // api: fr.applicius.foorgol.Spreadsheet
 
 val spreadsheet: Future[SpreadsheetInfo] = api.spreadsheet("anID")
+```
+
+**Create worksheet**
+
+```scala
+import scala.concurrent.Future
+
+// api: fr.applicius.foorgol.Spreadsheet
+
+val id: Future[String] = api.createWorksheet(spreadsheetId, "Work title")
 ```
 
 **List worksheets by spreadsheet ID**

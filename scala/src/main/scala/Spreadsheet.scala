@@ -282,7 +282,55 @@ trait Spreadsheet { http: WithHttp ⇒
       i + 1 -> (l :+ i -> v)
     }._2)
 
+  /**
+   * Creates a new worksheet.
+   *
+   * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
+   * @param title Worksheet title ([[WorksheetInfo.title]])
+   * @return ID of worksheet, on `Left` if previously created, on `Right` if newly created.
+   */
+  def createWorksheet(spreadsheetId: String, title: String, initialRows: Int = 10, initialCols: Int = 10): Future[Either[String, String]] = {
+    for {
+      ex ← worksheets(spreadsheetId).map(_.filter(_.title == title).headOption)
+      wid ← ex.fold[Future[Either[String, String]]](
+        Future(http.client acquireAndGet { c ⇒
+          val uri = new URI(s"https://spreadsheets.google.com/feeds/worksheets/$spreadsheetId/private/full")
+          val req = c.post(uri, worksheetXml(title, initialRows, initialCols), "application/atom+xml")
+
+          execHttp(req)(c) flatMap { r ⇒
+            if (r._2.getStatusLine.getStatusCode != 201 /* Created */ ) {
+              sys.error(
+                s"Fails to create worksheet: $spreadsheetId, cause: ${r._2.getStatusLine}")
+              // Will be pushed into wrapping ManagedResource
+            } else managed(new InputStreamReader(r._2.getEntity.getContent))
+          } map { r ⇒
+            val src = new InputSource(r)
+            src.setSystemId(uri.toString)
+            XML.load(src)
+          } acquireAndGet { xml ⇒
+            val id = (xml \\ "id").text
+            Right(id.drop(id.lastIndexOf('/') + 1))
+          }
+        }))(worksheet ⇒ Future.successful(Left(worksheet.id)))
+    } yield wid
+  }
+
   // ---
+
+  /** Execute request securely. */
+  private lazy val execHttp: HttpRequestBase ⇒ HttpClient ⇒ ManagedResource[(String, HttpResponse)] = refreshToken.fold({ req: HttpRequestBase ⇒
+    { c: HttpClient ⇒
+      c.execute(OAuthClient.prepare(req, accessToken)).map(resp ⇒
+        accessToken -> resp): ManagedResource[(String, HttpResponse)]
+    }
+  }) { ref ⇒
+    { req: HttpRequestBase ⇒
+      { c: HttpClient ⇒
+        c.execute(OAuthClient.refreshable(req, accessToken,
+          ref.clientId, ref.clientSecret, ref.token))
+      }
+    }
+  }
 
   /**
    * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
@@ -381,23 +429,9 @@ trait Spreadsheet { http: WithHttp ⇒
     }
 
     Future(http.client acquireAndGet { c ⇒
-      val exec: HttpRequestBase ⇒ HttpClient ⇒ ManagedResource[(String, HttpResponse)] = refreshToken.fold({ req: HttpRequestBase ⇒
-        { c: HttpClient ⇒
-          c.execute(OAuthClient.prepare(req, accessToken)).map(resp ⇒
-            accessToken -> resp): ManagedResource[(String, HttpResponse)]
-        }
-      }) { ref ⇒
-        { req: HttpRequestBase ⇒
-          { c: HttpClient ⇒
-            c.execute(OAuthClient.refreshable(req, accessToken,
-              ref.clientId, ref.clientSecret, ref.token))
-          }
-        }
-      }
-
       cells.foldLeft(List.empty[URI]) { (l, cell) ⇒
         val req = c.post(uri, cellXml(uri, cell), "application/atom+xml")
-        exec(req)(c) flatMap { r ⇒
+        execHttp(req)(c) flatMap { r ⇒
           if (r._2.getStatusLine.getStatusCode != 201 /* Created */ ) {
             sys.error(
               s"Fails to create cell: $cell, cause: ${r._2.getStatusLine}")
@@ -455,6 +489,14 @@ trait Spreadsheet { http: WithHttp ⇒
       info ← Future(xml \\ "entry").flatMap(go(z, _))
     } yield tok -> info
   }
+
+  /**
+   * @param title Worksheet title
+   * @param rows Row (initial) count
+   * @param cols Column (initial) count
+   */
+  @inline private def worksheetXml(title: String, rows: Int, cols: Int) =
+    s"""<entry xmlns="http://www.w3.org/2005/Atom" xmlns:gs="http://schemas.google.com/spreadsheets/2006"> <title>$title</title><gs:rowCount>$rows</gs:rowCount><gs:colCount>$cols</gs:colCount></entry>"""
 
   /**
    * @param uri Cells URI
