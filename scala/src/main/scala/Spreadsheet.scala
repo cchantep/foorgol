@@ -1,4 +1,4 @@
-package fr.applicius.foorgol
+package foorgol
 
 import java.io.InputStreamReader
 import java.util.{ Date, Locale }
@@ -568,7 +568,7 @@ object Spreadsheet {
    * @param refreshTok Optional refresh token
    *
    * {{{
-   * import fr.applicius.foorgol.Spreadsheet
+   * import foorgol.Spreadsheet
    *
    * Spreadsheet("mustNotBeExpired", None) // Cannot refresh access token
    *

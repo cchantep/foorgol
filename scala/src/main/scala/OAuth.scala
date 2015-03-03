@@ -1,3 +1,3 @@
-package fr.applicius.foorgol
+package foorgol
 
 case class RefreshToken(clientId: String, clientSecret: String, token: String)

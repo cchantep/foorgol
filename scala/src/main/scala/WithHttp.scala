@@ -1,4 +1,4 @@
-package fr.applicius.foorgol
+package foorgol
 
 import java.net.URI
 

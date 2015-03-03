@@ -1,4 +1,4 @@
-package fr.applicius.foorgol;
+package foorgol;
 
 import org.apache.http.client.methods.HttpGet;
 

@@ -2,7 +2,7 @@
 
 Google API client (or one the Discworld, the Ephebian God of Avalanches).
 
-[![Build Status](https://secure.travis-ci.org/applicius/foorgol.png?branch=master)](http://travis-ci.org/applicius/foorgol)
+[![Build Status](https://secure.travis-ci.org/cchantep/foorgol.png?branch=master)](http://travis-ci.org/cchantep/foorgol)
 
 ## Motivation
 
@@ -12,17 +12,17 @@ Foorgol help integration of some of these features.
 
 ## Usage
 
-Foorgool can be used in SBT projects adding dependency `"fr.applicius.foorgol" % "java-client" % "1.0.5-SNAPSHOT"` or `"fr.applicius.foorgol" %% "scala" % "1.0.5-SNAPSHOT"` and having `"Applicius Snapshots" at "https://raw.github.com/applicius/mvn-repo/master/snapshots/"` in resolvers.
+Foorgool can be used in SBT projects adding dependency `"foorgol" % "java-client" % "1.0.5-SNAPSHOT"` or `"foorgol" %% "scala" % "1.0.5-SNAPSHOT"` and having `"Tatami Releases" at "https://raw.github.com/cchantep/tatami/master/releases/"` in resolvers.
 
 * Low-level [Java API](http://cchantep.github.io/foorgol/java-client/api/)
 * [Scala API](http://cchantep.github.io/foorgol/scala/api/#package)
 
 ### Spreadsheet
 
-Scala [DSL for Google Spreadsheet](http://cchantep.github.io/foorgol/scala/api/#fr.applicius.foorgol.Spreadsheet) can be initialized as following.
+Scala [DSL for Google Spreadsheet](http://cchantep.github.io/foorgol/scala/api/#foorgol.Spreadsheet) can be initialized as following.
 
 ```scala
-import fr.applicius.foorgol.{ RefreshToken, Spreadsheet }
+import foorgol.{ RefreshToken, Spreadsheet }
 
 val api: Spreadsheet = Spreadsheet("accessToken")
 // Given access token must not be expired, as there refresh token is 
@@ -39,9 +39,9 @@ Once access to Google Spreadsheet is initialized, following features can be used
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.SpreadsheetInfo
+import foorgol.SpreadsheetInfo
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 val spreadsheets: Future[List[SpreadsheetInfo]] = api.list
 ```
@@ -50,9 +50,9 @@ val spreadsheets: Future[List[SpreadsheetInfo]] = api.list
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.SpreadsheetInfo
+import foorgol.SpreadsheetInfo
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 val spreadsheet: Future[SpreadsheetInfo] = api.spreadsheet("anID")
 ```
@@ -62,7 +62,7 @@ val spreadsheet: Future[SpreadsheetInfo] = api.spreadsheet("anID")
 ```scala
 import scala.concurrent.Future
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 val id: Future[String] = api.createWorksheet(spreadsheetId, "Work title")
 ```
@@ -71,9 +71,9 @@ val id: Future[String] = api.createWorksheet(spreadsheetId, "Work title")
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetInfo
+import foorgol.WorksheetInfo
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 val worksheets: Future[List[WorksheetInfo]] = api.worksheets(spreadsheetId)
 ```
@@ -82,10 +82,10 @@ val worksheets: Future[List[WorksheetInfo]] = api.worksheets(spreadsheetId)
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetInfo
+import foorgol.WorksheetInfo
 
-// api: fr.applicius.foorgol.Spreadsheet
-// sheet: fr.applicius.foorgol.SpreadsheetInfo
+// api: foorgol.Spreadsheet
+// sheet: foorgol.SpreadsheetInfo
 
 val worksheets: Future[List[WorksheetInfo]] = 
   api.worksheets(sheet.worksheetsUri)
@@ -95,9 +95,9 @@ val worksheets: Future[List[WorksheetInfo]] =
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetInfo
+import foorgol.WorksheetInfo
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 val firstWorksheet: Future[Option[WorksheetInfo]] = 
   api.worksheet("spreadsheetId", 0)
 ```
@@ -106,9 +106,9 @@ val firstWorksheet: Future[Option[WorksheetInfo]] =
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetInfo
+import foorgol.WorksheetInfo
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 val worksheet: Future[Option[WorksheetInfo]] = 
   api.worksheet("spreadsheetId", "worksheetId")
 ```
@@ -117,9 +117,9 @@ val worksheet: Future[Option[WorksheetInfo]] =
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetInfo
+import foorgol.WorksheetInfo
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 // Find worksheet with matching title
 val matching: Future[Option[WorksheetInfo]] =
@@ -135,9 +135,9 @@ val matching: Future[Option[WorksheetInfo]] =
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetCells
+import foorgol.WorksheetCells
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 val cells: Future[Option[WorksheetCells]] = 
   api.cells("spreadsheetId", 0, None, None)
@@ -148,9 +148,9 @@ val cells: Future[Option[WorksheetCells]] =
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetCells
+import foorgol.WorksheetCells
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 val cells: Future[Option[WorksheetCells]] = 
   api.cells("spreadsheetId", "worksheetId", None, None)
@@ -161,10 +161,10 @@ val cells: Future[Option[WorksheetCells]] =
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetCells
+import foorgol.WorksheetCells
 
-// api: fr.applicius.foorgol.Spreadsheet
-// work: fr.applicius.foorgol.WorksheetInfo
+// api: foorgol.Spreadsheet
+// work: foorgol.WorksheetInfo
 
 val cells: Future[Option[WorksheetCells]] = api.cells(work.cellsUri, None, None)
 ```
@@ -173,9 +173,9 @@ val cells: Future[Option[WorksheetCells]] = api.cells(work.cellsUri, None, None)
 
 ```scala
 import scala.concurrent.Future
-import fr.applicius.foorgol.WorksheetCells
+import foorgol.WorksheetCells
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 val last: Future[Option[WorksheetCells]] = 
   api.lastRow("spreadsheetId", "worksheetId")
@@ -186,8 +186,8 @@ val last: Future[Option[WorksheetCells]] =
 ```scala
 import scala.concurrent.Future
 
-// api: fr.applicius.foorgol.Spreadsheet
-// work: fr.applicius.foorgol.WorksheetInfo
+// api: foorgol.Spreadsheet
+// work: foorgol.WorksheetInfo
 
 // Will change content for cells (4, 1) and (4, 3)
 val versionUris: Future[List[String]] = api.change(work.cellsUri, 
@@ -200,7 +200,7 @@ val versionUris: Future[List[String]] = api.change(work.cellsUri,
 ```scala
 import scala.concurrent.Future
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 // Will change content for cells (1, 1) and (1, 2),
 // in second worksheet of specified spreadsheet.
@@ -213,7 +213,7 @@ val versionUris: Future[List[String]] = api.change("spreadsheetId", 1,
 ```scala
 import scala.concurrent.Future
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 // Will change content for cells (1, 1) and (1, 2),
 // in specified worksheet of specified spreadsheet.
@@ -227,7 +227,7 @@ val versionUris: Future[List[String]] =
 ```scala
 import scala.concurrent.Future
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 // Append a row with first cell "A" and third one "C"
 val versionUris: Future[List[String]] = 
@@ -240,7 +240,7 @@ val versionUris: Future[List[String]] =
 ```scala
 import scala.concurrent.Future
 
-// api: fr.applicius.foorgol.Spreadsheet
+// api: foorgol.Spreadsheet
 
 // Append a row with contiguous cells ("A", "B", "C")
 val versionUris: Future[List[String]] = 

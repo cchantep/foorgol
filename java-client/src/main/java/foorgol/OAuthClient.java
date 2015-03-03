@@ -1,4 +1,4 @@
-package fr.applicius.foorgol;
+package foorgol;
 
 import java.io.InputStreamReader;
 import java.io.InputStream;

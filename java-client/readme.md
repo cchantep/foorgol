@@ -12,7 +12,7 @@ If an *offline token* as expired, you can refresh it.
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 
-import fr.applicius.foorgol.OAuthClient;
+import foorgol.OAuthClient;
 
 DefaultHttpClient client = new DefaultHttpClient();
 
@@ -31,7 +31,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 
-import fr.applicius.foorgol.OAuthClient;
+import foorgol.OAuthClient;
 
 OAuthClient.Refreshable<HttpPost> refreshable = 
   OAuthClient.refreshable(myPost, 
