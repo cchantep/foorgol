@@ -391,8 +391,8 @@ object MockSpreadsheet {
 }
 
 sealed trait SpreadsheetFixtures {
-  import java.text.SimpleDateFormat
   import java.util.Locale
+  import java.text.SimpleDateFormat
 
   import org.apache.http.ProtocolVersion
   import org.apache.http.entity.StringEntity

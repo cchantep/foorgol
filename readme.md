@@ -262,4 +262,4 @@ val versionUris: Future[List[String]] =
 
 ## Build
 
-Foorgol can be built from these sources using SBT (1.1.4+): `sbt publish`
+Foorgol can be built from these sources using SBT (1.1+): `sbt publish`
