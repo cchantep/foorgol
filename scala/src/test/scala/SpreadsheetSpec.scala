@@ -2,10 +2,10 @@ package foorgol
 
 import java.net.URI
 
-import scala.util.Failure
+import org.specs2.concurrent.ExecutionEnv
 import scala.concurrent.duration.Duration
 
-object SpreadsheetSpec
+class SpreadsheetSpec(implicit ee: ExecutionEnv)
     extends org.specs2.mutable.Specification with SpreadsheetFixtures {
 
   "Spreadsheet" title
@@ -391,12 +391,12 @@ object MockSpreadsheet {
 }
 
 sealed trait SpreadsheetFixtures {
-  import java.util.Locale
   import java.text.SimpleDateFormat
+  import java.util.Locale
 
   import org.apache.http.ProtocolVersion
   import org.apache.http.entity.StringEntity
-  import org.apache.http.message.{ BasicHttpResponse, BasicStatusLine }
+  import org.apache.http.message.{BasicHttpResponse, BasicStatusLine}
 
   val httpProto = new ProtocolVersion("http", 1, 1)
 
