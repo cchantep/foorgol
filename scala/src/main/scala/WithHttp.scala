@@ -2,12 +2,11 @@ package foorgol
 
 import java.net.URI
 
-import org.apache.http.{ HttpResponse, NameValuePair }
-import org.apache.http.entity.StringEntity
+import org.apache.http.{HttpResponse, NameValuePair}
+import org.apache.http.entity.{ContentType, StringEntity}
 import org.apache.http.message.BasicNameValuePair
-import org.apache.http.client.methods.{ HttpGet, HttpPost, HttpRequestBase }
+import org.apache.http.client.methods.{HttpGet, HttpPost, HttpRequestBase}
 import org.apache.http.client.utils.URIBuilder
-
 import resource.ManagedResource
 
 /** HTTP client abstraction. */
@@ -30,8 +29,8 @@ trait HttpClient extends java.io.Closeable {
     }
 
   /** Executes a POST request and returns its response. */
-  def post(uri: URI, body: String, mimeType: String) = {
-    val ent = new StringEntity(body, mimeType, "UTF-8")
+  def post(uri: URI, body: String, contentType: ContentType) = {
+    val ent = new StringEntity(body, contentType.withCharset("UTF-8"))
     val post = new HttpPost(uri)
     post.setEntity(ent)
     post

@@ -1,17 +1,17 @@
 package foorgol
 
 import java.io.InputStreamReader
-import java.util.{ Date, Locale }
+import java.util.{Date, Locale}
 import java.text.SimpleDateFormat
 import java.net.URI
 
 import org.apache.http.HttpResponse
 import org.apache.http.client.methods.HttpRequestBase
+import org.apache.http.entity.ContentType
 
-import scala.xml.{ Elem, InputSource, Node, XML }
-import scala.concurrent.{ ExecutionContext, Future }
-
-import resource.{ ManagedResource, managed }
+import scala.xml.{Elem, InputSource, Node, XML}
+import scala.concurrent.{ExecutionContext, Future}
+import resource.{ManagedResource, managed}
 
 /** Google spreadsheet DSL. */
 trait Spreadsheet { http: WithHttp ⇒
@@ -246,7 +246,7 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
    * @param worksheetId Worksheet ID ([[SpreadsheetInfo.id]])
    * @param values Cell values with associated positions (first = 1)
-   * @param List of version URIs for each created cell
+   * @return List of version URIs for each created cell
    *
    * {{{
    * // Put (1 -> "A", 3 -> "C") in first and third columns or a new row
@@ -268,7 +268,7 @@ trait Spreadsheet { http: WithHttp ⇒
    * @param spreadsheetId Spreadsheet ID ([[SpreadsheetInfo.id]])
    * @param worksheetId Worksheet ID ([[SpreadsheetInfo.id]])
    * @param values Uninterrupted sequence of cell values
-   * @param List of version URIs for each created cell
+   * @return List of version URIs for each created cell
    *
    * {{{
    * // Put ("A", "B") in first and second columns or a new row
@@ -291,11 +291,11 @@ trait Spreadsheet { http: WithHttp ⇒
    */
   def createWorksheet(spreadsheetId: String, title: String, initialRows: Int = 10, initialCols: Int = 10): Future[Either[String, String]] = {
     for {
-      ex ← worksheets(spreadsheetId).map(_.filter(_.title == title).headOption)
+      ex ← worksheets(spreadsheetId).map(_.find(_.title == title))
       wid ← ex.fold[Future[Either[String, String]]](
         Future(http.client acquireAndGet { c ⇒
           val uri = new URI(s"https://spreadsheets.google.com/feeds/worksheets/$spreadsheetId/private/full")
-          val req = c.post(uri, worksheetXml(title, initialRows, initialCols), "application/atom+xml")
+          val req = c.post(uri, worksheetXml(title, initialRows, initialCols), ContentType.APPLICATION_ATOM_XML)
 
           execHttp(req)(c) flatMap { r ⇒
             if (r._2.getStatusLine.getStatusCode != 201 /* Created */ ) {
@@ -430,7 +430,7 @@ trait Spreadsheet { http: WithHttp ⇒
 
     Future(http.client acquireAndGet { c ⇒
       cells.foldLeft(List.empty[URI]) { (l, cell) ⇒
-        val req = c.post(uri, cellXml(uri, cell), "application/atom+xml")
+        val req = c.post(uri, cellXml(uri, cell), ContentType.APPLICATION_ATOM_XML)
         execHttp(req)(c) flatMap { r ⇒
           if (r._2.getStatusLine.getStatusCode != 201 /* Created */ ) {
             sys.error(
