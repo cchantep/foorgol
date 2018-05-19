@@ -396,7 +396,7 @@ sealed trait SpreadsheetFixtures {
 
   import org.apache.http.ProtocolVersion
   import org.apache.http.entity.StringEntity
-  import org.apache.http.message.{BasicHttpResponse, BasicStatusLine}
+  import org.apache.http.message.{ BasicHttpResponse, BasicStatusLine }
 
   val httpProto = new ProtocolVersion("http", 1, 1)
 

@@ -1,7 +1,7 @@
 package foorgol
 
 import java.io.InputStreamReader
-import java.util.{Date, Locale}
+import java.util.{ Date, Locale }
 import java.text.SimpleDateFormat
 import java.net.URI
 
@@ -9,9 +9,9 @@ import org.apache.http.HttpResponse
 import org.apache.http.client.methods.HttpRequestBase
 import org.apache.http.entity.ContentType
 
-import scala.xml.{Elem, InputSource, Node, XML}
-import scala.concurrent.{ExecutionContext, Future}
-import resource.{ManagedResource, managed}
+import scala.xml.{ Elem, InputSource, Node, XML }
+import scala.concurrent.{ ExecutionContext, Future }
+import resource.{ ManagedResource, managed }
 
 /** Google spreadsheet DSL. */
 trait Spreadsheet { http: WithHttp ⇒

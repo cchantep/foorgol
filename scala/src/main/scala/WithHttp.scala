@@ -2,10 +2,10 @@ package foorgol
 
 import java.net.URI
 
-import org.apache.http.{HttpResponse, NameValuePair}
-import org.apache.http.entity.{ContentType, StringEntity}
+import org.apache.http.{ HttpResponse, NameValuePair }
+import org.apache.http.entity.{ ContentType, StringEntity }
 import org.apache.http.message.BasicNameValuePair
-import org.apache.http.client.methods.{HttpGet, HttpPost, HttpRequestBase}
+import org.apache.http.client.methods.{ HttpGet, HttpPost, HttpRequestBase }
 import org.apache.http.client.utils.URIBuilder
 import resource.ManagedResource
 
