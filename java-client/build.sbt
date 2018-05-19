@@ -10,6 +10,6 @@ libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.1",
   "org.apache.httpcomponents" % "httpclient" % "4.3.5",
   "com.google.code.gson" % "gson" % "2.3",
-  "org.specs2" %% "specs2" % "2.4.1" % "test")
+  "org.specs2" %% "specs2-core" % "4.2.0")
 
 publishTo := Some(Resolver.file("file",  new File(Path.userHome.absolutePath+"/.m2/repository")))

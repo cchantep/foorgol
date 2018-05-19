@@ -2,10 +2,10 @@ package foorgol
 
 import java.net.URI
 
-import scala.util.Failure
+import org.specs2.concurrent.ExecutionEnv
 import scala.concurrent.duration.Duration
 
-object SpreadsheetSpec
+class SpreadsheetSpec(implicit ee: ExecutionEnv)
     extends org.specs2.mutable.Specification with SpreadsheetFixtures {
 
   "Spreadsheet" title

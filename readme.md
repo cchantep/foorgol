@@ -12,7 +12,12 @@ Foorgol help integration of some of these features.
 
 ## Usage
 
-Foorgool can be used in SBT projects adding dependency `"foorgol" % "java-client" % "1.0.5-SNAPSHOT"` or `"foorgol" %% "scala" % "1.0.5-SNAPSHOT"` and having `"Tatami Releases" at "https://raw.github.com/cchantep/tatami/master/releases/"` in resolvers.
+To include foorgol to your sbt project, add the following lines to your `build.sbt`:
+```sbtshell
+resolvers += "Tatami Releases" at "https://raw.github.com/cchantep/tatami/master/releases/"
+
+libraryDependencies += "foorgol" %% "scala" % "1.0.5-SNAPSHOT" // or "foorgol" % "java-client" % "1.0.5-SNAPSHOT"
+``` 
 
 * Low-level [Java API](http://cchantep.github.io/foorgol/java-client/api/)
 * [Scala API](http://cchantep.github.io/foorgol/scala/api/#package)
@@ -253,8 +258,8 @@ val versionUris: Future[List[String]] =
 ## Requirements
 
 * Java 1.6+
-* SBT 0.12+
+* SBT 1.1+
 
 ## Build
 
-Foorgol can be built from these sources using SBT (0.12.2+): `sbt publish`
+Foorgol can be built from these sources using SBT (1.1+): `sbt publish`
