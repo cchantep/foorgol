@@ -5,7 +5,7 @@ lazy val scala = Project(id = "scala", base = file("scala")).dependsOn(java)
 lazy val root = Project(id = "foorgol", base = file(".")).
   settings(
     organization in ThisBuild := "foorgol",
-    version in ThisBuild := "1.0.6",
+    version in ThisBuild := "1.0.7",
     scalaVersion in ThisBuild := "2.12.6",
     crossScalaVersions in ThisBuild := Seq("2.10.7", "2.11.12", scalaVersion.value)
   ).aggregate(java, scala)

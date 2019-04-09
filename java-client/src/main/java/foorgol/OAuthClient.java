@@ -229,45 +229,13 @@ public class OAuthClient {
             CloseableHttpResponse resp = null;
 
             try {
-                resp = client.
-                    execute(prepare(this.underlying, this.accessToken));
+                logger.warning("Always execute with refreshed token");
+                resp = client.execute(refreshRequest(clientId, clientSecret, refreshToken));
+                final String tok = parseRefreshResponse(resp);
+                resp.close();
 
-                final int statusCode = resp.getStatusLine().getStatusCode();
-
-                logger.log(Level.FINER, "Initial status code: {0}", statusCode);
-
-                final Header contentLength = 
-                    resp.getFirstHeader("Content-Length");
-
-                final String len = (contentLength == null) ? "" 
-                    : contentLength.getValue();
-
-                final boolean successful = 
-                    (statusCode >= 200 && statusCode < 300);
-
-                if (successful && !"0".equals(len)) {
-                    return ImmutablePair.of(this.accessToken, resp);
-                } else if (successful || statusCode == 401) {
-                    logger.warning("Will try to execute with refreshed token");
-
-                    resp.close();
-
-                    resp = client.execute(refreshRequest(clientId, clientSecret, refreshToken));
-
-                    final String tok = parseRefreshResponse(resp);
-
-                    resp.close();
-
-                    logger.log(Level.FINE, "Refresh access token: {0}", tok);
-                    
-                    return ImmutablePair.
-                        of(tok, client.execute(prepare(underlying, tok)));
-
-                } // end of else if
-
-                // ---
-
-                throw new IllegalStateException("Unexpected status code: " + statusCode);
+                logger.log(Level.FINE, "Refresh access token: {0}", tok);
+                return ImmutablePair.of(tok, client.execute(prepare(underlying, tok)));
             } catch (RuntimeException re) {
                 throw re;
             } catch (Exception e) {
