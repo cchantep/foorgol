@@ -302,7 +302,7 @@ trait Spreadsheet { http: WithHttp ⇒
               sys.error(
                 s"Fails to create worksheet: $spreadsheetId, cause: ${r._2.getStatusLine}")
               // Will be pushed into wrapping ManagedResource
-            } else managed(new InputStreamReader(r._2.getEntity.getContent))
+            } else managed(new InputStreamReader(r._2.getEntity.getContent, "UTF-8"))
           } map { r ⇒
             val src = new InputSource(r)
             src.setSystemId(uri.toString)
@@ -436,7 +436,7 @@ trait Spreadsheet { http: WithHttp ⇒
             sys.error(
               s"Fails to create cell: $cell, cause: ${r._2.getStatusLine}")
             // Will be pushed into wrapping ManagedResource
-          } else managed(new InputStreamReader(r._2.getEntity.getContent))
+          } else managed(new InputStreamReader(r._2.getEntity.getContent, "UTF-8"))
         } map { r ⇒
           val src = new InputSource(r)
           src.setSystemId(uri.toString)
@@ -544,7 +544,7 @@ trait Spreadsheet { http: WithHttp ⇒
           val resp = res._2
 
           if (resp.getStatusLine.getStatusCode == 200) {
-            managed(new InputStreamReader(resp.getEntity.getContent)) map { r ⇒
+            managed(new InputStreamReader(resp.getEntity.getContent, "UTF-8")) map { r ⇒
               val src = new InputSource(r)
               src.setSystemId(uri)
               src
