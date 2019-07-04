@@ -1,6 +1,6 @@
 language: scala
 jdk:
-   - openjdk6
+   - openjdk8
 env: JAVA_OPTS="-Xms32m -Xmx128m"
 scala:
    - 2.11.2
