@@ -8,7 +8,7 @@ resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshot
 
 libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.1",
-  "org.apache.httpcomponents" % "httpclient" % "4.3.5",
+  "org.apache.httpcomponents" % "httpclient" % "4.3.6",
   "com.google.code.gson" % "gson" % "2.3",
   "org.specs2" %% "specs2-core" % "4.2.0")
 
