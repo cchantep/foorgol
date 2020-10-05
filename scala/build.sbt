@@ -2,7 +2,7 @@ name := "scala"
 
 javaOptions += "-deprecation"
 
-resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
+resolvers += Resolver.typesafeRepo("snapshots")
 
 libraryDependencies ++= Seq(
   "foorgol" % "java-client" % version.value,

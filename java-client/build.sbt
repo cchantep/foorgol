@@ -4,7 +4,7 @@ javaOptions += "-deprecation"
 
 crossPaths := false
 
-resolvers += "Typesafe Snapshots" at "http://repo.typesafe.com/typesafe/snapshots/"
+resolvers += Resolver.typesafeRepo("snapshots")
 
 libraryDependencies ++= Seq(
   "org.apache.commons" % "commons-lang3" % "3.9",
