@@ -7,7 +7,7 @@ crossPaths := false
 resolvers += Resolver.typesafeRepo("snapshots")
 
 libraryDependencies ++= Seq(
-  "org.apache.commons" % "commons-lang3" % "3.18.0",
+  "org.apache.commons" % "commons-lang3" % "3.19.0",
   "org.apache.httpcomponents" % "httpclient" % "4.5.14",
   "com.google.code.gson" % "gson" % "2.13.2",
   "org.specs2" %% "specs2-core" % "4.2.0")
